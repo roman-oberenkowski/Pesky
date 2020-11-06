@@ -1,5 +1,5 @@
 package pl.grupaPelnaBledow;
-
+//Author of the whole code: Richard G. Baldwin
 /*File AudioCapture01.java
 This program demonstrates the capture
 and subsequent playback of audio data.
