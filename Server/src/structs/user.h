@@ -33,4 +33,6 @@ UserList* add_to_usr_list(UserList* list, User* user);
 User* find_on_usr_list(UserList* list, char* username);
 UserList* remove_user_from_usr_list(UserList* list, User* user);
 
+void set_username(User* user, char* username);
+
 #endif //SERVER_USER_H

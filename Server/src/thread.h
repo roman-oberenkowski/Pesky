@@ -12,6 +12,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <regex.h>
 #include "constants.h"
 #include "structs/list_head.h"
 

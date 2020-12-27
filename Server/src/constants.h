@@ -5,7 +5,7 @@
 #ifndef SERVER_CONSTANTS_H
 #define SERVER_CONSTANTS_H
 
-#define SERVER_PORT 1234
+#define SERVER_PORT 1235
 #define MSG_DELIMITER '\n'
 
 #endif //SERVER_CONSTANTS_H
