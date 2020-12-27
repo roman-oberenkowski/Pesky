@@ -243,6 +243,7 @@ public class AudioCapture01
                             tempBuffer,
                             0,
                             tempBuffer.length);
+                    System.out.println(cnt);
                     if (cnt > 0) {
                         //Save data in output stream
                         // object.
