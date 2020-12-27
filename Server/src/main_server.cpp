@@ -39,13 +39,16 @@ int SetupServerSocket() {
     return server_socket_descriptor;
 }
 
-void handleConnection(int connection_socket_descriptor) {
+void handleConnection(int connection_socket_descriptor, UserListHead* list) {
     int create_result = 0;
     pthread_t thread1;
     printf("New connection");
     struct thread_data_t* t_data = (struct thread_data_t*) malloc(sizeof(struct thread_data_t));
-    t_data->connection_socket_descriptor = connection_socket_descriptor;
-
+    User* user = create_user();
+    user->connection_descriptor  = connection_socket_descriptor;
+    add_to_list(list, user);
+    t_data->user = user;
+    t_data->list = list;
     create_result = pthread_create(&thread1, NULL, ThreadBehavior, (void *)t_data);
     if (create_result){
         printf("Blad przy probie utworzenia watku, kod bledu: %d\n", create_result);
@@ -53,7 +56,7 @@ void handleConnection(int connection_socket_descriptor) {
     }
 }
 
-void ServerMainLoop(int server_socket_descriptor) {
+void ServerMainLoop(int server_socket_descriptor, UserListHead* list) {
     int connection_socket_descriptor;
 
     while(1)
@@ -64,7 +67,7 @@ void ServerMainLoop(int server_socket_descriptor) {
             fprintf(stderr, "Blad przy probie utworzenia gniazda dla polaczenia.\n");
             exit(1);
         }
-        handleConnection(connection_socket_descriptor);
+        handleConnection(connection_socket_descriptor, list);
     }
 }
 

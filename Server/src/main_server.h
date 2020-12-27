@@ -19,10 +19,10 @@
 
 int SetupServerSocket();
 
-void ServerMainLoop(int server_socket_descriptor);
+void ServerMainLoop(int server_socket_descriptor, UserListHead* list);
 
 int SetupEpoll ();
 
-void handleConnection(int connection_socket_descriptor);
+void handleConnection(int connection_socket_descriptor, UserListHead* list);
 
 #endif //SERVER_MAIN_SERVER_H

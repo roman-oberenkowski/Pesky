@@ -9,7 +9,7 @@ User *create_user() {
     user->username                  = (char*)malloc(32 * sizeof(char));
     user->connection_descriptor     = -1;
     user->calls_to                  = NULL;
-    user->semaphore                 = PTHREAD_MUTEX_INITIALIZER;
+    user->semaphore                 = (pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER;
     return user;
 }
 

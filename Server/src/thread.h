@@ -13,10 +13,12 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include "constants.h"
+#include "structs/list_head.h"
 
 struct thread_data_t
 {
-    int connection_socket_descriptor;
+    User* user;
+    UserListHead* list;
 };
 
 void *ThreadBehavior(void *t_data);

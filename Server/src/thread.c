@@ -15,9 +15,10 @@ void *ThreadBehavior(void *t_data)
     char content[512];
     char *message;
     struct thread_data_t *th_data = (struct thread_data_t*)t_data;
+    pthread_detach(pthread_self());
 
     printf("Entering thread");
-    while((size=read(th_data->connection_socket_descriptor, incoming_data, 255)) > 0)
+    while((size=read(th_data->user->connection_descriptor, incoming_data, 255)) > 0)
     {
         incoming_data[size] = '\0';
         strcat(user_data, incoming_data);
@@ -31,11 +32,12 @@ void *ThreadBehavior(void *t_data)
             if(strcmp(message, "close") == 0)
             {
                 printf("Closing connection with client\n");
-                close((*th_data).connection_socket_descriptor);
+                close((*th_data).user->connection_descriptor);
                 break;
             }
             else
             {
+                //TODO PROCESS MESSAGE
                 printf("> %s %s\n", type, content);
             }
             message = strtok(NULL, "\n");
@@ -50,8 +52,9 @@ void *ThreadBehavior(void *t_data)
         }
     }
     printf("Exiting thread");
+    remove_user_from_list(th_data->list, th_data->user);
+    free(th_data->user);
     free(t_data);
-    pthread_detach(pthread_self());
     pthread_exit(NULL);
 }
 
