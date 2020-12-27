@@ -7,9 +7,10 @@ void processMessage(char* message);
 
 void *ThreadBehavior(void *t_data)
 {
-    char user_data[512];
+    char user_data[512] = "";
     char incoming_data[255];
     int size;
+    char *message;
     struct thread_data_t *th_data = (struct thread_data_t*)t_data;
 
     printf("Entering thread");
@@ -17,15 +18,29 @@ void *ThreadBehavior(void *t_data)
     {
         incoming_data[size] = '\0';
         strcat(user_data, incoming_data);
-        if(strcmp(incoming_data, "close\n") == 0)
+
+        while (strchr(user_data, MSG_DELIMITER) != NULL)
         {
-            printf("Closing connection with client\n");
-            close((*th_data).connection_socket_descriptor);
-            break;
-        }
-        else
-        {
-            printf("> %s\n", incoming_data);
+            message = strtok(user_data, "\n");
+            if(strcmp(message, "close") == 0)
+            {
+                printf("Closing connection with client\n");
+                close((*th_data).connection_socket_descriptor);
+                break;
+            }
+            else
+            {
+                printf("> %s\n", message);
+            }
+            message = strtok(NULL, "\n");
+            if (message == NULL)
+            {
+                memset(user_data,0,strlen(user_data));
+            }
+            else
+            {
+                strcpy(user_data, message);
+            }
         }
     }
     printf("Exiting thread");

@@ -6,5 +6,6 @@
 #define SERVER_CONSTANTS_H
 
 #define SERVER_PORT 1234
+#define MSG_DELIMITER '\n'
 
 #endif //SERVER_CONSTANTS_H
