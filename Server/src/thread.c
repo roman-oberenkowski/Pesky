@@ -5,11 +5,14 @@
 
 void processMessage(char* message);
 
+
 void *ThreadBehavior(void *t_data)
 {
     char user_data[512] = "";
     char incoming_data[255];
     int size;
+    char type[16];
+    char content[512];
     char *message;
     struct thread_data_t *th_data = (struct thread_data_t*)t_data;
 
@@ -22,6 +25,9 @@ void *ThreadBehavior(void *t_data)
         while (strchr(user_data, MSG_DELIMITER) != NULL)
         {
             message = strtok(user_data, "\n");
+            sscanf(message, "type:%[^;];content:%*s;\n", type);
+            sscanf(message, "type:%*[^;];content:%s;\n", content);
+
             if(strcmp(message, "close") == 0)
             {
                 printf("Closing connection with client\n");
@@ -30,7 +36,7 @@ void *ThreadBehavior(void *t_data)
             }
             else
             {
-                printf("> %s\n", message);
+                printf("> %s %s\n", type, content);
             }
             message = strtok(NULL, "\n");
             if (message == NULL)
