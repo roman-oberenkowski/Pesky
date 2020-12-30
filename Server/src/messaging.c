@@ -12,7 +12,7 @@ void getType(char *message, char *type) {
     sscanf(message, "type:%[^;];content:%*s;", type);
 }
 
-void sendMessage(User *user, char message[], int size) {
+void sendMessage_lock(User *user, char message[], int size) {
     if(user != NULL)
     {
         pthread_mutex_lock(&user->semaphore);
@@ -21,36 +21,55 @@ void sendMessage(User *user, char message[], int size) {
     }
 }
 
-void sendConfirmMessage(User* user, char content[])
+void sendMessage(User *user, char message[], int size) {
+    if(user != NULL)
+    {
+        write(user->connection_descriptor, message, size);
+    }
+}
+
+void sendConfirmMessage(User* user, char content[], int lock)
 {
     char message[MAX_CONFIRM_SIZE] = "type:confirm;content:";
     strcat(message, content);
     strcat(message, ";\n");
-    sendMessage(user, message, MAX_CONFIRM_SIZE);
+    if (lock == 1)
+        sendMessage(user, message, MAX_CONFIRM_SIZE);
+    else
+        sendMessage_lock(user, message, MAX_CONFIRM_SIZE);
 }
 
-void sendErrorMessage(User* user, char content[])
+void sendErrorMessage(User* user, char content[], int lock)
 {
     char message[MAX_ERROR_SIZE] = "type:error;content:";
     strcat(message, content);
     strcat(message, ";\n");
-    sendMessage(user, message, MAX_ERROR_SIZE);
+    if (lock == 1)
+        sendMessage(user, message, MAX_ERROR_SIZE);
+    else
+        sendMessage_lock(user, message, MAX_ERROR_SIZE);
 }
 
-void sendJoinedMessage(User* receiver_user, User* caller_user)
+void sendJoinedMessage(User* receiver_user, User* caller_user, int lock)
 {
-    char message[MAX_ERROR_SIZE] = "type:joined;content:";
+    char message[MAX_CONFIRM_SIZE] = "type:joined;content:";
     strcat(message, caller_user->username);
     strcat(message, ";\n");
-    sendMessage(receiver_user, message, MAX_ERROR_SIZE);
+    if (lock == 1)
+        sendMessage(receiver_user, message, MAX_CONFIRM_SIZE);
+    else
+        sendMessage_lock(receiver_user, message, MAX_CONFIRM_SIZE);
 }
 
-void sendDisconnectMessage(User* receiver_user, User* caller_user)
+void sendDisconnectMessage(User* receiver_user, User* caller_user, int lock)
 {
-    char message[MAX_ERROR_SIZE] = "type:disconnect;content:";
+    char message[MAX_CONFIRM_SIZE] = "type:disconnect;content:";
     strcat(message, caller_user->username);
     strcat(message, ";\n");
-    sendMessage(receiver_user, message, MAX_ERROR_SIZE);
+    if (lock == 1)
+        sendMessage(receiver_user, message, MAX_CONFIRM_SIZE);
+    else
+        sendMessage_lock(receiver_user, message, MAX_CONFIRM_SIZE);
 }
 
 void forwardMessage(User* user, char message[])
@@ -76,6 +95,55 @@ int processMessage(struct thread_data_t *thread_data, char message[])
     getType(message, type);
     if(strcmp(type, "call_to") == 0)
     {
+        pthread_mutex_lock(&thread_data->user->semaphore);
+        if (thread_data->user->calls_to != NULL)
+        {
+            sendErrorMessage(thread_data->user, "Still connected to another user.", 0);
+            pthread_mutex_unlock(&thread_data->user->semaphore);
+            return 0;
+        }
+        if (strcmp(thread_data->user->username, "") == 0)
+        {
+            sendErrorMessage(thread_data->user, "User has no username.", 0);
+            pthread_mutex_unlock(&thread_data->user->semaphore);
+            return 0;
+        }
+        pthread_mutex_unlock(&thread_data->user->semaphore);
+
+        getContent(message, content);
+        if (strcmp(content, "") != 0)
+        {
+            pthread_mutex_lock(&thread_data->list->semaphore);
+            User* user = find_on_usr_list(thread_data->list->next, content);
+            pthread_mutex_lock(&thread_data->user->semaphore);
+            if (user != NULL)
+            {
+                pthread_mutex_lock(&user->semaphore);
+                if (user->calls_to == NULL)
+                {
+                    user->calls_to = thread_data->user;
+                    thread_data->user->calls_to = user;
+                    sendJoinedMessage(user, thread_data->user, 0);
+                    sendConfirmMessage(thread_data->user, "Successfully changed username", 0);
+                    printf("User %s called to %s\n", thread_data->user->username, user->username);
+                }
+                else
+                {
+                    sendErrorMessage(thread_data->user, "User is in another conversation", 0);
+                }
+                pthread_mutex_unlock(&user->semaphore);
+            }
+            else
+            {
+                sendErrorMessage(thread_data->user, "User with this username does not exists", 0);
+            }
+            pthread_mutex_unlock(&thread_data->user->semaphore);
+            pthread_mutex_unlock(&thread_data->list->semaphore);
+        }
+        else
+        {
+            sendErrorMessage(thread_data->user, "Given incorrect content data", 1);
+        }
     }
     else if(strcmp(type, "set_username") == 0)
     {
@@ -86,11 +154,11 @@ int processMessage(struct thread_data_t *thread_data, char message[])
         {
             set_username(thread_data->user, content);
             printf("Changed username to: %s\n", content);
-            sendConfirmMessage(thread_data->user, "Successfully changed username");
+            sendConfirmMessage(thread_data->user, "Successfully changed username", 1);
         }
         else
         {
-            sendErrorMessage(thread_data->user, "User with this username already exists");
+            sendErrorMessage(thread_data->user, "User with this username already exists", 1);
         }
         pthread_mutex_unlock(&thread_data->list->semaphore);
     }
@@ -109,7 +177,7 @@ int processMessage(struct thread_data_t *thread_data, char message[])
             getContent(message, content);
             printf("Recieved incorrect message type> %s %s\n", type, content);
         }
-        sendErrorMessage(thread_data->user, "Recieved incorrect message");
+        sendErrorMessage(thread_data->user, "Recieved incorrect message", 1);
     }
     return 1;
 }

@@ -15,6 +15,7 @@ void exitThread(struct thread_data_t *thread_data)
     if (thread_data->user->calls_to != NULL)
     {
         pthread_mutex_lock(&thread_data->user->calls_to->semaphore);
+        sendDisconnectMessage(thread_data->user->calls_to, thread_data->user, 0);
         thread_data->user->calls_to->calls_to = NULL;
         pthread_mutex_unlock(&thread_data->user->calls_to->semaphore);
     }

@@ -22,16 +22,18 @@ void getType(char message[], char* type);
 
 void sendMessage(User* user, char message[], int size);
 
-void sendConfirmMessage(User* user, char content[]);
+void sendMessage_lock(User* user, char message[], int size);
 
-void sendErrorMessage(User* user, char content[]);
+void sendConfirmMessage(User* user, char content[], int lock);
+
+void sendErrorMessage(User* user, char content[], int lock);
 
 void forwardMessage(User* user, char message[]);
 
 int processMessage(struct thread_data_t *thread_data, char message[]);
 
-void sendJoinedMessage(User* receiver_user, User* caller_user);
+void sendJoinedMessage(User* receiver_user, User* caller_user, int lock);
 
-void sendDisconnectMessage(User* receiver_user, User* caller_user);
+void sendDisconnectMessage(User* receiver_user, User* caller_user, int lock);
 
 #endif //SERVER_MESSAGING_H
