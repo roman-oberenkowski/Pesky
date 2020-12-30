@@ -51,6 +51,6 @@ UserList* remove_user_from_usr_list(UserList *list, User *user) {
 
 void set_username(User *user, char* username) {
     pthread_mutex_lock(&user->semaphore);
-    user->username = username;
+    strcpy(user->username, username);
     pthread_mutex_unlock(&user->semaphore);
 }
