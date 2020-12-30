@@ -148,19 +148,26 @@ int processMessage(struct thread_data_t *thread_data, char message[])
     else if(strcmp(type, "set_username") == 0)
     {
         getContent(message, content);
-        pthread_mutex_lock(&thread_data->list->semaphore);
-        User* user = find_on_usr_list(thread_data->list->next, content);
-        if (user == NULL)
+        if (strcmp(content, "") == 0)
         {
-            set_username(thread_data->user, content);
-            printf("Changed username to: %s\n", content);
-            sendConfirmMessage(thread_data->user, "Successfully changed username", 1);
+            sendErrorMessage(thread_data->user, "Given incorrect content data", 1);
         }
         else
         {
-            sendErrorMessage(thread_data->user, "User with this username already exists", 1);
+            pthread_mutex_lock(&thread_data->list->semaphore);
+            User* user = find_on_usr_list(thread_data->list->next, content);
+            if (user == NULL)
+            {
+                set_username(thread_data->user, content);
+                printf("Changed username to: %s\n", content);
+                sendConfirmMessage(thread_data->user, "Successfully changed username", 1);
+            }
+            else
+            {
+                sendErrorMessage(thread_data->user, "User with this username already exists", 1);
+            }
+            pthread_mutex_unlock(&thread_data->list->semaphore);
         }
-        pthread_mutex_unlock(&thread_data->list->semaphore);
     }
     else if(strcmp(type, "audio") == 0 || strcmp(type, "video") == 0)
     {
