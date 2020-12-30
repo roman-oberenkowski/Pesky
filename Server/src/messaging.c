@@ -37,6 +37,22 @@ void sendErrorMessage(User* user, char content[])
     sendMessage(user, message, MAX_ERROR_SIZE);
 }
 
+void sendJoinedMessage(User* receiver_user, User* caller_user)
+{
+    char message[MAX_ERROR_SIZE] = "type:joined;content:";
+    strcat(message, caller_user->username);
+    strcat(message, ";\n");
+    sendMessage(receiver_user, message, MAX_ERROR_SIZE);
+}
+
+void sendDisconnectMessage(User* receiver_user, User* caller_user)
+{
+    char message[MAX_ERROR_SIZE] = "type:disconnect;content:";
+    strcat(message, caller_user->username);
+    strcat(message, ";\n");
+    sendMessage(receiver_user, message, MAX_ERROR_SIZE);
+}
+
 void forwardMessage(User* user, char message[])
 {
     if (user != NULL)
@@ -58,12 +74,8 @@ int processMessage(struct thread_data_t *thread_data, char message[])
     char content[MAX_CONTENT_SIZE] = "";
 
     getType(message, type);
-
-    if(strcmp(type, "close") == 0)
+    if(strcmp(type, "call_to") == 0)
     {
-        printf("Closing connection with client\n");
-        close((*thread_data).user->connection_descriptor);
-        return 0;
     }
     else if(strcmp(type, "set_username") == 0)
     {
@@ -82,14 +94,22 @@ int processMessage(struct thread_data_t *thread_data, char message[])
         }
         pthread_mutex_unlock(&thread_data->list->semaphore);
     }
-    else if(strcmp(type, "audio") == 0)
+    else if(strcmp(type, "audio") == 0 || strcmp(type, "video") == 0)
     {
         forwardMessage(thread_data->user, message);
     }
+    else if(strcmp(type, "disconnect") == 0)
+    {
+        return 0;
+    }
     else
     {
-        getContent(message, content);
-        printf("> %s %s\n", type, content);
+        if (DEBUG == 1)
+        {
+            getContent(message, content);
+            printf("Recieved incorrect message type> %s %s\n", type, content);
+        }
+        sendErrorMessage(thread_data->user, "Recieved incorrect message");
     }
     return 1;
 }

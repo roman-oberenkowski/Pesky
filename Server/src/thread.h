@@ -22,6 +22,8 @@ struct thread_data_t
     UserListHead* list;
 };
 
+void exitThread(struct thread_data_t *thread_data);
+
 void *ThreadBehavior(void *t_data);
 
 

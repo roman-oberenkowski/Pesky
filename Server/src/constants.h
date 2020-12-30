@@ -16,4 +16,6 @@
 #define MSG_DELIMITER_CHR '\n'
 #define MSG_DELIMITER_STR "\n"
 
+#define DEBUG 1
+
 #endif //SERVER_CONSTANTS_H

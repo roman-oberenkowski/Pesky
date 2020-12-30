@@ -4,6 +4,29 @@
 #include "thread.h"
 #include "messaging.h"
 
+void exitThread(struct thread_data_t *thread_data)
+{
+    int descriptor;
+    pthread_mutex_t semaphore;
+    pthread_mutex_lock(&thread_data->user->semaphore);
+    semaphore = thread_data->user->semaphore;
+    descriptor = thread_data->user->connection_descriptor;
+    remove_user_from_list(thread_data->list, thread_data->user);
+    if (thread_data->user->calls_to != NULL)
+    {
+        pthread_mutex_lock(&thread_data->user->calls_to->semaphore);
+        thread_data->user->calls_to->calls_to = NULL;
+        pthread_mutex_unlock(&thread_data->user->calls_to->semaphore);
+    }
+    free(thread_data->user->username);
+    free(thread_data->user);
+    pthread_mutex_unlock(&semaphore);
+    pthread_attr_destroy((pthread_attr_t *) &semaphore);
+    close(descriptor);
+    free(thread_data);
+    pthread_exit(NULL);
+}
+
 void *ThreadBehavior(void *t_data)
 {
     char user_data[MAX_INCOMING_SIZE*3] = "";
@@ -40,9 +63,6 @@ void *ThreadBehavior(void *t_data)
             break;
     }
     pthread_detach(pthread_self());
-    remove_user_from_list(th_data->list, th_data->user);
-    free(th_data->user);
-    free(t_data);
-    pthread_exit(NULL);
+    exitThread(th_data);
 }
 

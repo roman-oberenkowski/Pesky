@@ -30,4 +30,8 @@ void forwardMessage(User* user, char message[]);
 
 int processMessage(struct thread_data_t *thread_data, char message[]);
 
+void sendJoinedMessage(User* receiver_user, User* caller_user);
+
+void sendDisconnectMessage(User* receiver_user, User* caller_user);
+
 #endif //SERVER_MESSAGING_H
