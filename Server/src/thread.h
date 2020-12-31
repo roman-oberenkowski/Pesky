@@ -16,16 +16,14 @@
 #include "constants.h"
 #include "structs/list_head.h"
 
-struct thread_data_t
-{
-    User* user;
-    UserListHead* list;
+struct thread_data_t {
+    User *user;
+    UserListHead *list;
 };
 
 void exitThread(struct thread_data_t *thread_data);
 
 void *ThreadBehavior(void *t_data);
-
 
 
 #endif //SERVER_THREAD_H

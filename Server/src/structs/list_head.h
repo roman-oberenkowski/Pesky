@@ -13,15 +13,17 @@
 #include <string.h>
 #include "user.h"
 
-typedef struct UserListHead{
+typedef struct UserListHead {
     pthread_mutex_t semaphore;
-    struct UserList* next;
+    struct UserList *next;
 } UserListHead;
 
-UserListHead* create_list_head();
+UserListHead *create_list_head();
 
-void add_to_list(UserListHead* list, User* user);
-User* find_on_list(UserListHead* list, char* username);
-void remove_user_from_list(UserListHead* list, User* user);
+void add_to_list(UserListHead *list, User *user);
+
+User *find_on_list(UserListHead *list, char *username);
+
+void remove_user_from_list(UserListHead *list, User *user);
 
 #endif //SERVER_LIST_HEAD_H

@@ -16,27 +16,27 @@
 #include "structs/list_head.h"
 #include "thread.h"
 
-void getContent(char message[], char* content);
+void getContent(char message[], char *content);
 
-void getType(char message[], char* type);
+void getType(char message[], char *type);
 
-void sendMessage(User* user, char message[], int size);
+void sendMessage(User *user, char message[], int size);
 
-void sendMessage_lock(User* user, char message[], int size);
+void sendMessage_lock(User *user, char message[], int size);
 
-void sendConfirmMessage(User* user, char content[], int lock);
+void sendConfirmMessage(User *user, char content[], int lock);
 
-void sendErrorMessage(User* user, char content[], int lock);
+void sendErrorMessage(User *user, char content[], int lock);
 
-void sendJoinedMessage(User* receiver_user, User* caller_user, int lock);
+void sendJoinedMessage(User *receiver_user, User *caller_user, int lock);
 
-void sendDisconnectMessage(User* receiver_user, User* caller_user, int lock);
+void sendDisconnectMessage(User *receiver_user, User *caller_user, int lock);
 
 int processSetUsernameMessage(struct thread_data_t *thread_data, char *message, char *content);
 
 int processCallToMessage(struct thread_data_t *thread_data, char *message, char *content);
 
-int processForwardMessage(User* user, char *message);
+int processForwardMessage(User *user, char *message);
 
 int processIncorrectMessage(struct thread_data_t *thread_data, char message[], const char *type, char *content);
 

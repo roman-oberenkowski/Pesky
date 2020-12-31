@@ -5,9 +5,9 @@
 #include "list_head.h"
 
 UserListHead *create_list_head() {
-    UserListHead* list_head = (UserListHead*)malloc(sizeof(UserListHead));
+    UserListHead *list_head = (UserListHead *) malloc(sizeof(UserListHead));
     list_head->next = NULL;
-    list_head->semaphore                 = (pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER;
+    list_head->semaphore = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
     return list_head;
 }
 
@@ -19,7 +19,7 @@ void add_to_list(UserListHead *list, User *user) {
 
 User *find_on_list(UserListHead *list, char *username) {
     pthread_mutex_lock(&list->semaphore);
-    User* user = find_on_usr_list(list->next, username);
+    User *user = find_on_usr_list(list->next, username);
     pthread_mutex_unlock(&list->semaphore);
     return user;
 }

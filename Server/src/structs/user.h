@@ -14,26 +14,26 @@
 
 #include <pthread.h>
 
-typedef struct User{
-    char* username;
+typedef struct User {
+    char *username;
     int connection_descriptor;
-    struct User* calls_to;
+    struct User *calls_to;
     pthread_mutex_t semaphore;
 } User;
 
-typedef struct UserList{
-    User* user;
-    struct UserList* next;
+typedef struct UserList {
+    User *user;
+    struct UserList *next;
 } UserList;
 
-User* create_user();
+User *create_user();
 
-UserList* add_to_usr_list(UserList* list, User* user);
+UserList *add_to_usr_list(UserList *list, User *user);
 
-User* find_on_usr_list(UserList* list, char* username);
+User *find_on_usr_list(UserList *list, char *username);
 
-UserList* remove_user_from_usr_list(UserList* list, User* user);
+UserList *remove_user_from_usr_list(UserList *list, User *user);
 
-void set_username(User* user, char* username);
+void set_username(User *user, char *username);
 
 #endif //SERVER_USER_H
