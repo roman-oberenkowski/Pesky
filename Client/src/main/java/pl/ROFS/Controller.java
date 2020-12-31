@@ -217,17 +217,13 @@ public class Controller {
                         case "joined":
                             break;
                         case "audio":
-
                             long audioStart=System.currentTimeMillis();
                             decodedContent = DatatypeConverter.parseBase64Binary(content);
-
-                            System.out.println(speakers.available());
-                            int audioCount=speakers.write(decodedContent, 0, min(decodedContent.length,speakers.available()));
-                            long audioEnd=System.currentTimeMillis();
-                            System.out.println(audioEnd-audioStart+" czasu na "+ audioCount);
-                            if(audioCount<10000){
+                            if(speakers.available()<soundBufferSize){
                                 speakers.flush();
-                                System.out.println("flushed!"+audioCount);
+                                System.out.println("Reciving audio would block -> flushed!");
+                            }else{
+                                speakers.write(decodedContent, 0, min(decodedContent.length,speakers.available()));
                             }
                             break;
                         case "video":
