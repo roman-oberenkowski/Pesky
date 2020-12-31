@@ -5,11 +5,17 @@
 #include "messaging.h"
 
 void getContent(char *message, char *content) {
-    sscanf(message, "type:%*[^;];content:%s;", content);
+    if (message != NULL && strlen(message)>7)
+        sscanf(message, "type:%*[^;];content:%s;", content);
+    else
+        strcpy(content, "undefined");
 }
 
 void getType(char *message, char *type) {
-    sscanf(message, "type:%[^;];content:%*s;", type);
+    if (message != NULL && strlen(message)>7)
+        sscanf(message, "type:%[^;];content:%*s;", type);
+    else
+        strcpy(type, "undefined");
 }
 
 void sendMessage_lock(User *user, char message[], int size) {
