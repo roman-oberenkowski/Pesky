@@ -10,7 +10,6 @@ import javafx.embed.swing.SwingFXUtils;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.*;
@@ -30,6 +29,9 @@ public class Controller {
     public ImageView myView;
     public ImageView callerView;
     public TextArea logArea;
+    public TextArea targetUserField;
+    public Button startCallButton;
+    public Button joinCallButton;
     PrintWriter writer;
     BufferedReader reader;
     private SourceDataLine speakers;
@@ -38,10 +40,27 @@ public class Controller {
     private Thread receiveFromServerThread;
     private Thread captureCameraThread;
     private boolean privateServer=false;
-    private final int soundBufferSize=10000;
+    private final int soundBufferSize=100;
     public void initialize() {
         callPane.setVisible(false);
         loginPane.setVisible(true);
+        startCallButton.setDisable(true);
+        joinCallButton.setDisable(true);
+    }
+
+    public void connected(){
+        startCallButton.setDisable(false);
+        joinCallButton.setDisable(false);
+    }
+
+    public void startCallHandler(){
+        sendToServer("set_username",usernameField.getText());
+        setupAfterCallSuccessfull();
+    }
+    public void joinCallHandler(){
+        sendToServer("set_username",usernameField.getText());
+        sendToServer("call_to",targetUserField.getText());
+        setupAfterCallSuccessfull();
     }
 
     class CaptureCameraThread extends Thread{
@@ -90,9 +109,9 @@ public class Controller {
                         String audio_data=DatatypeConverter.printBase64Binary(Arrays.copyOfRange(tempBuffer,0,cnt));
                         sendToServer("audio",audio_data);
                     }
-                    Thread.sleep(10);
+                    //Thread.sleep(10);
                 }
-            } catch (IOException | UnsupportedAudioFileException | InterruptedException e) {
+            } catch (IOException | UnsupportedAudioFileException  e) {
                 e.printStackTrace();
             }
         }
@@ -123,9 +142,15 @@ public class Controller {
                         exit();
                     }
                     try {
+                        long start = System.currentTimeMillis();
+// ...
+
                         splited = serverMessage.split(";");
                         type = splited[0].split(":")[1];
                         right = splited[1];
+                        long finish = System.currentTimeMillis();
+                        long timeElapsed = finish - start;
+                        //System.out.println("splitting: "+timeElapsed);
                     }
                     catch(ArrayIndexOutOfBoundsException e){
                         System.out.println("message format error! ommiting -> "+serverMessage);
@@ -136,6 +161,9 @@ public class Controller {
                     }catch (ArrayIndexOutOfBoundsException e){
                         content="";
                     }
+                    long start = System.currentTimeMillis();
+// ...
+
                     switch(type){
                         case "joined":
                             break;
@@ -158,7 +186,11 @@ public class Controller {
                             break;
                         default:
                             System.out.println("type error in recived message! -> "+type);
+
                     }
+                    long finish = System.currentTimeMillis();
+                    long timeElapsed = finish - start;
+                    System.out.println(type+" processing: "+timeElapsed);
                 }
 
             } catch (IOException e) {
@@ -200,8 +232,7 @@ public class Controller {
             return;
         }
         logArea.appendText("connected to server\n");
-        sendToServer("set_username",usernameField.getText());
-        setupAfterConnectionSuccessfull();
+        connected();
     }
 
     private void sendToServer(String type,String content){
@@ -227,7 +258,7 @@ public class Controller {
         }
         logArea.appendText(" -> server started");
         privateServer=true;
-        setupAfterConnectionSuccessfull();
+        connected();
 
 
     }
@@ -246,7 +277,7 @@ public class Controller {
         return new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
     }
 
-    public void setupAfterConnectionSuccessfull() {
+    public void setupAfterCallSuccessfull() {
         callPane.setVisible(true);
         loginPane.setVisible(false);
         setupAudioOutput();

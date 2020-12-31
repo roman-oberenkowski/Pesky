@@ -11,25 +11,27 @@
    <children>
       <Pane fx:id="loginPane" prefHeight="409.0" prefWidth="609.0" style="-fx-background-color: gray;">
          <children>
-            <TextArea fx:id="ipField" layoutX="225.0" layoutY="57.0" prefHeight="34.0" prefWidth="160.0" promptText="Please provide server IP" text="127.0.0.1" />
-            <Label layoutX="300.0" layoutY="29.0" text="IP" />
-            <TextArea fx:id="usernameField" layoutX="225.0" layoutY="148.0" prefHeight="34.0" prefWidth="160.0" promptText="Please type your username" text="user" />
-            <Label layoutX="278.0" layoutY="116.0" text="Username" />
-            <Button fx:id="connectButton" layoutX="273.0" layoutY="222.0" mnemonicParsing="false" onAction="#connectButtonPressed" text="Connect!" />
+            <TextArea fx:id="ipField" layoutX="145.0" layoutY="57.0" prefHeight="34.0" prefWidth="160.0" promptText="Please provide server IP" text="127.0.0.1" />
+            <Label layoutX="120.0" layoutY="67.0" text="IP" />
+            <TextArea fx:id="usernameField" layoutX="106.0" layoutY="186.0" prefHeight="34.0" prefWidth="160.0" promptText="Please type your username" text="user" />
+            <Label layoutX="159.0" layoutY="153.0" text="Username" />
+            <Button fx:id="connectButton" layoutX="315.0" layoutY="63.0" mnemonicParsing="false" onAction="#connectButtonPressed" text="Connect!" />
             <Button fx:id="hostButton" layoutX="394.0" layoutY="63.0" mnemonicParsing="false" onAction="#hostButtonPressed" text="Host" />
+            <TextArea fx:id="targetUserField" layoutX="286.0" layoutY="186.0" prefHeight="34.0" prefWidth="160.0" promptText="Please type your username" text="user2" />
+            <Button fx:id="startCallButton" layoutX="160.0" layoutY="243.0" mnemonicParsing="false" onAction="#startCallHandler" text="StartCall" />
+            <Button fx:id="joinCallButton" layoutX="340.0" layoutY="243.0" mnemonicParsing="false" onAction="#joinCallHandler" text="JoinCall" />
+            <Label layoutX="339.0" layoutY="162.0" text="Target user" />
          </children>
       </Pane>
-      <Pane fx:id="callPane" prefHeight="409.0" prefWidth="609.0" style="-fx-background-color: green;">
+      <Pane fx:id="callPane" prefHeight="409.0" prefWidth="609.0" style="-fx-background-color: green;" visible="false">
          <children>
-            <Button layoutX="275.0" layoutY="54.0" mnemonicParsing="false" onAction="#startPlayingAudioClip" text="playClip" />
-            <Button layoutX="278.0" layoutY="125.0" mnemonicParsing="false" onAction="#setupAudioOutput" text="recive audio and play it" />
-            <ImageView fx:id="myView" fitHeight="150.0" fitWidth="200.0" layoutX="51.0" layoutY="192.0" pickOnBounds="true" preserveRatio="true" />
-            <ImageView fx:id="callerView" fitHeight="150.0" fitWidth="200.0" layoutX="291.0" layoutY="205.0" pickOnBounds="true" preserveRatio="true" />
-            <Button layoutX="278.0" layoutY="180.0" mnemonicParsing="false" onAction="#startCamera" text="StartCamera" />
+            <Button layoutX="39.0" layoutY="36.0" mnemonicParsing="false" onAction="#startPlayingAudioClip" text="playClip" />
+            <ImageView fx:id="myView" fitHeight="203.0" fitWidth="272.0" layoutX="14.0" layoutY="192.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="callerView" fitHeight="203.0" fitWidth="280.0" layoutX="315.0" layoutY="192.0" pickOnBounds="true" preserveRatio="true" />
+            <Button layoutX="39.0" layoutY="70.0" mnemonicParsing="false" onAction="#startCamera" text="StartCamera" />
          </children>
       </Pane>
       <TextArea fx:id="logArea" layoutY="417.0" prefHeight="184.0" prefWidth="609.0" promptText="log info" />
-      <Button layoutX="527.0" layoutY="417.0" mnemonicParsing="false" onAction="#setupAfterConnectionSuccessfull" text="SwitchPanes" />
-      <Button layoutX="475.0" layoutY="417.0" mnemonicParsing="false" onAction="#exit" text="Exit" />
+      <Button layoutX="569.0" layoutY="417.0" mnemonicParsing="false" onAction="#exit" text="Exit" />
    </children>
 </AnchorPane>
