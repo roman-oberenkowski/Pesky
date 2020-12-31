@@ -16,6 +16,7 @@
 #include <unistd.h>
 
 #include "constants.h"
+#include "thread.h"
 
 int SetupServerSocket();
 

@@ -9,12 +9,18 @@ void exitThread(struct thread_data_t *thread_data)
     int descriptor;
     pthread_mutex_t semaphore;
     pthread_mutex_lock(&thread_data->user->semaphore);
+    if (DEBUG == 1)
+        printf("INFO: \t Disconnecting user %s\n", thread_data->user->username);
+
     semaphore = thread_data->user->semaphore;
     descriptor = thread_data->user->connection_descriptor;
+
     remove_user_from_list(thread_data->list, thread_data->user);
     if (thread_data->user->calls_to != NULL)
     {
         pthread_mutex_lock(&thread_data->user->calls_to->semaphore);
+        if (DEBUG == 1)
+            printf("INFO: \t Closing chat between %s and %s\n", thread_data->user->username, thread_data->user->calls_to->username);
         sendDisconnectMessage(thread_data->user->calls_to, thread_data->user, 0);
         thread_data->user->calls_to->calls_to = NULL;
         pthread_mutex_unlock(&thread_data->user->calls_to->semaphore);
@@ -22,9 +28,10 @@ void exitThread(struct thread_data_t *thread_data)
     free(thread_data->user->username);
     free(thread_data->user);
     pthread_mutex_unlock(&semaphore);
-    pthread_attr_destroy((pthread_attr_t *) &semaphore);
     close(descriptor);
     free(thread_data);
+    if (DEBUG == 1)
+        printf("INFO: \t Closed thread successfully\n");
     pthread_exit(NULL);
 }
 
@@ -41,6 +48,8 @@ void *ThreadBehavior(void *t_data)
 
     while((size=read(th_data->user->connection_descriptor, incoming_data, MAX_INCOMING_SIZE)) > 0)
     {
+        if (DEBUG == 1)
+            printf("INFO: \t Recieved message: %s\n", incoming_data);
         incoming_data[size] = '\0';
         strcat(user_data, incoming_data);
 
@@ -52,18 +61,14 @@ void *ThreadBehavior(void *t_data)
                 break;
             message = strtok(NULL, MSG_DELIMITER_STR);
             if (message == NULL)
-            {
                 memset(user_data,0,strlen(user_data));
-            }
             else
-            {
                 strcpy(user_data, message);
-            }
         }
         if (connection_status == 0)
             break;
     }
     pthread_detach(pthread_self());
     exitThread(th_data);
+    return 0;
 }
-
