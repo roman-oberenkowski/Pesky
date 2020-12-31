@@ -6,6 +6,7 @@ module pl.ROFS {
     requires org.bytedeco.javacv;
     requires webcam.capture;
     requires javafx.swing;
+    requires java.xml.bind;
 
 
     opens pl.ROFS to javafx.fxml;
