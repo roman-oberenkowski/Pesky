@@ -17,6 +17,8 @@ import java.util.Arrays;
 import javax.xml.bind.DatatypeConverter;
 import com.github.sarxos.webcam.Webcam;
 
+import static java.lang.Math.min;
+
 
 public class Controller {
     private final int port = 4201;
@@ -40,7 +42,7 @@ public class Controller {
     private Thread receiveFromServerThread;
     private Thread captureCameraThread;
     private boolean privateServer=false;
-    private final int soundBufferSize=100;
+    private final int soundBufferSize=10000;
     public void initialize() {
         callPane.setVisible(false);
         loginPane.setVisible(true);
@@ -63,6 +65,15 @@ public class Controller {
         setupAfterCallSuccessfull();
     }
 
+    public void flushSpeakers(){
+        speakers.flush();
+    }
+
+    public void printAvailableSDL(){
+        System.out.println("sp ava: "+speakers.available()+" sp");
+
+    }
+
     class CaptureCameraThread extends Thread{
         public void run(){
             while(true) {
@@ -78,11 +89,11 @@ public class Controller {
                 String video_data=DatatypeConverter.printBase64Binary(img_byte_array);
                 sendToServer("video",video_data);
 
-//                try {
-//                    Thread.sleep(50);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -124,6 +135,41 @@ public class Controller {
         }
     }
 
+    public void startRecordingMic(){
+        new SendMicrophoneThread().start();
+
+    }
+
+    class SendMicrophoneThread extends Thread{
+        public void run(){
+            DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, getAudioFormat());
+            TargetDataLine targetDataLine = null;
+            try {
+                targetDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
+                targetDataLine.open(getAudioFormat());
+            } catch (LineUnavailableException e) {
+                e.printStackTrace();
+            }
+            targetDataLine.start();
+            System.out.println("microphone buffer size: "+targetDataLine.getBufferSize());
+
+            byte[] tempBuffer = new byte[soundBufferSize];
+
+            int cnt=1;
+            while (cnt>=0) {
+                System.out.println("available: "+targetDataLine.available());
+                cnt = targetDataLine.read(tempBuffer, 0, tempBuffer.length);
+                if (cnt > 0) {
+                    String audio_data=DatatypeConverter.printBase64Binary(Arrays.copyOfRange(tempBuffer,0,cnt));
+                    sendToServer("audio",audio_data);
+                }
+                //Thread.sleep(10);
+            }
+        }
+    }
+
+
+
     class ReciveFromServerThread extends Thread{
         public void run() {
             try {
@@ -138,19 +184,19 @@ public class Controller {
                 while(true){
                     try{
                     serverMessage = reader.readLine();
-                    } catch(SocketException e){
+                    } catch(SocketException | SocketTimeoutException e){
                         exit();
                     }
+                    long start = System.currentTimeMillis();
                     try {
-                        long start = System.currentTimeMillis();
+
 // ...
 
                         splited = serverMessage.split(";");
                         type = splited[0].split(":")[1];
                         right = splited[1];
-                        long finish = System.currentTimeMillis();
-                        long timeElapsed = finish - start;
-                        //System.out.println("splitting: "+timeElapsed);
+
+
                     }
                     catch(ArrayIndexOutOfBoundsException e){
                         System.out.println("message format error! ommiting -> "+serverMessage);
@@ -161,15 +207,28 @@ public class Controller {
                     }catch (ArrayIndexOutOfBoundsException e){
                         content="";
                     }
-                    long start = System.currentTimeMillis();
+                    long finish = System.currentTimeMillis();
+                    long timeElapsed = finish - start;
+                    //System.out.println("splitting: "+timeElapsed);
+                    start = System.currentTimeMillis();
 // ...
 
                     switch(type){
                         case "joined":
                             break;
                         case "audio":
+
+                            long audioStart=System.currentTimeMillis();
                             decodedContent = DatatypeConverter.parseBase64Binary(content);
-                            speakers.write(decodedContent, 0, decodedContent.length);
+
+                            System.out.println(speakers.available());
+                            int audioCount=speakers.write(decodedContent, 0, min(decodedContent.length,speakers.available()));
+                            long audioEnd=System.currentTimeMillis();
+                            System.out.println(audioEnd-audioStart+" czasu na "+ audioCount);
+                            if(audioCount<10000){
+                                speakers.flush();
+                                System.out.println("flushed!"+audioCount);
+                            }
                             break;
                         case "video":
                             decodedContent = DatatypeConverter.parseBase64Binary(content);
@@ -188,9 +247,9 @@ public class Controller {
                             System.out.println("type error in recived message! -> "+type);
 
                     }
-                    long finish = System.currentTimeMillis();
-                    long timeElapsed = finish - start;
-                    System.out.println(type+" processing: "+timeElapsed);
+                    finish = System.currentTimeMillis();
+                    timeElapsed = finish - start;
+                    //System.out.println(type+" processing: "+timeElapsed);
                 }
 
             } catch (IOException e) {
@@ -206,6 +265,7 @@ public class Controller {
             speakers = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
             speakers.open(audioFormat);
             speakers.start();
+            System.out.println("speakers buffer size: "+speakers.getBufferSize());
         } catch (LineUnavailableException e) {
             e.printStackTrace();
         }

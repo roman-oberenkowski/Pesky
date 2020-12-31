@@ -9,7 +9,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.ROFS.Controller">
    <children>
-      <Pane fx:id="loginPane" prefHeight="409.0" prefWidth="609.0" style="-fx-background-color: gray;">
+      <Pane fx:id="loginPane" prefHeight="409.0" prefWidth="609.0" style="-fx-background-color: gray;" visible="false">
          <children>
             <TextArea fx:id="ipField" layoutX="145.0" layoutY="57.0" prefHeight="34.0" prefWidth="160.0" promptText="Please provide server IP" text="127.0.0.1" />
             <Label layoutX="120.0" layoutY="67.0" text="IP" />
@@ -23,12 +23,15 @@
             <Label layoutX="339.0" layoutY="162.0" text="Target user" />
          </children>
       </Pane>
-      <Pane fx:id="callPane" prefHeight="409.0" prefWidth="609.0" style="-fx-background-color: green;" visible="false">
+      <Pane fx:id="callPane" prefHeight="409.0" prefWidth="609.0" style="-fx-background-color: green;">
          <children>
             <Button layoutX="39.0" layoutY="36.0" mnemonicParsing="false" onAction="#startPlayingAudioClip" text="playClip" />
             <ImageView fx:id="myView" fitHeight="203.0" fitWidth="272.0" layoutX="14.0" layoutY="192.0" pickOnBounds="true" preserveRatio="true" />
             <ImageView fx:id="callerView" fitHeight="203.0" fitWidth="280.0" layoutX="315.0" layoutY="192.0" pickOnBounds="true" preserveRatio="true" />
             <Button layoutX="39.0" layoutY="70.0" mnemonicParsing="false" onAction="#startCamera" text="StartCamera" />
+            <Button layoutX="143.0" layoutY="36.0" mnemonicParsing="false" onAction="#startRecordingMic" text="Capture microphone" />
+            <Button layoutX="168.0" layoutY="83.0" mnemonicParsing="false" onAction="#flushSpeakers" text="flush" />
+            <Button layoutX="315.0" layoutY="58.0" mnemonicParsing="false" onAction="#printAvailableSDL" text="PrintSDL" />
          </children>
       </Pane>
       <TextArea fx:id="logArea" layoutY="417.0" prefHeight="184.0" prefWidth="609.0" promptText="log info" />
