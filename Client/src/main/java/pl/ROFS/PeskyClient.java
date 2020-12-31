@@ -22,7 +22,7 @@ public class PeskyClient extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Pesky Client");
-        primaryStage.setScene(new Scene(root));
+        primaryStage.setScene(new Scene(root,600,600));
         //exit all threads on window close
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override

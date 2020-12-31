@@ -13,7 +13,7 @@
          <children>
             <TextArea fx:id="ipField" layoutX="225.0" layoutY="57.0" prefHeight="34.0" prefWidth="160.0" promptText="Please provide server IP" text="127.0.0.1" />
             <Label layoutX="300.0" layoutY="29.0" text="IP" />
-            <TextArea fx:id="usernameField" layoutX="225.0" layoutY="148.0" prefHeight="34.0" prefWidth="160.0" promptText="Please type your username" />
+            <TextArea fx:id="usernameField" layoutX="225.0" layoutY="148.0" prefHeight="34.0" prefWidth="160.0" promptText="Please type your username" text="user" />
             <Label layoutX="278.0" layoutY="116.0" text="Username" />
             <Button fx:id="connectButton" layoutX="273.0" layoutY="222.0" mnemonicParsing="false" onAction="#connectButtonPressed" text="Connect!" />
             <Button fx:id="hostButton" layoutX="394.0" layoutY="63.0" mnemonicParsing="false" onAction="#hostButtonPressed" text="Host" />
@@ -22,10 +22,14 @@
       <Pane fx:id="callPane" prefHeight="409.0" prefWidth="609.0" style="-fx-background-color: green;">
          <children>
             <Button layoutX="275.0" layoutY="54.0" mnemonicParsing="false" onAction="#startPlayingAudioClip" text="playClip" />
-            <Button layoutX="278.0" layoutY="125.0" mnemonicParsing="false" onAction="#startRecivingAudio" text="recive audio and play it" />
+            <Button layoutX="278.0" layoutY="125.0" mnemonicParsing="false" onAction="#setupAudioOutput" text="recive audio and play it" />
             <ImageView fx:id="myView" fitHeight="150.0" fitWidth="200.0" layoutX="51.0" layoutY="192.0" pickOnBounds="true" preserveRatio="true" />
             <ImageView fx:id="callerView" fitHeight="150.0" fitWidth="200.0" layoutX="291.0" layoutY="205.0" pickOnBounds="true" preserveRatio="true" />
+            <Button layoutX="278.0" layoutY="180.0" mnemonicParsing="false" onAction="#startCamera" text="StartCamera" />
          </children>
       </Pane>
+      <TextArea fx:id="logArea" layoutY="417.0" prefHeight="184.0" prefWidth="609.0" promptText="log info" />
+      <Button layoutX="527.0" layoutY="417.0" mnemonicParsing="false" onAction="#setupAfterConnectionSuccessfull" text="SwitchPanes" />
+      <Button layoutX="475.0" layoutY="417.0" mnemonicParsing="false" onAction="#exit" text="Exit" />
    </children>
 </AnchorPane>

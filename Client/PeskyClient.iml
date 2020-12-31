@@ -39,5 +39,7 @@
     <orderEntry type="library" name="Maven: com.github.sarxos:webcam-capture:0.3.12" level="project" />
     <orderEntry type="library" name="Maven: com.nativelibs4java:bridj:0.7.0" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.2" level="project" />
+    <orderEntry type="library" name="Maven: jakarta.xml.bind:jakarta.xml.bind-api:2.3.3" level="project" />
+    <orderEntry type="library" name="Maven: jakarta.activation:jakarta.activation-api:1.2.2" level="project" />
   </component>
 </module>
