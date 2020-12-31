@@ -28,12 +28,18 @@ void sendConfirmMessage(User* user, char content[], int lock);
 
 void sendErrorMessage(User* user, char content[], int lock);
 
-void forwardMessage(User* user, char message[]);
-
-int processMessage(struct thread_data_t *thread_data, char message[]);
-
 void sendJoinedMessage(User* receiver_user, User* caller_user, int lock);
 
 void sendDisconnectMessage(User* receiver_user, User* caller_user, int lock);
+
+int processSetUsernameMessage(struct thread_data_t *thread_data, char *message, char *content);
+
+int processCallToMessage(struct thread_data_t *thread_data, char *message, char *content);
+
+int processForwardMessage(User* user, char *message);
+
+int processIncorrectMessage(struct thread_data_t *thread_data, char message[], const char *type, char *content);
+
+int processMessage(struct thread_data_t *thread_data, char message[]);
 
 #endif //SERVER_MESSAGING_H

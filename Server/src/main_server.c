@@ -43,13 +43,16 @@ int SetupServerSocket() {
 void handleConnection(int connection_socket_descriptor, UserListHead* list) {
     int create_result = 0;
     pthread_t thread1;
-    printf("INFO: \t Server recieved a new connection\n");
     struct thread_data_t* t_data = (struct thread_data_t*) malloc(sizeof(struct thread_data_t));
+
+    printf("INFO: \t Server recieved a new connection\n");
+
     User* user = create_user();
     user->connection_descriptor  = connection_socket_descriptor;
     add_to_list(list, user);
     t_data->user = user;
     t_data->list = list;
+
     create_result = pthread_create(&thread1, NULL, ThreadBehavior, (void *)t_data);
     if (create_result)
     {

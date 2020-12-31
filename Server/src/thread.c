@@ -19,12 +19,15 @@ void exitThread(struct thread_data_t *thread_data)
     if (thread_data->user->calls_to != NULL)
     {
         pthread_mutex_lock(&thread_data->user->calls_to->semaphore);
+
         if (DEBUG == 1)
             printf("INFO: \t Closing chat between %s and %s\n", thread_data->user->username, thread_data->user->calls_to->username);
         sendDisconnectMessage(thread_data->user->calls_to, thread_data->user, 0);
         thread_data->user->calls_to->calls_to = NULL;
+
         pthread_mutex_unlock(&thread_data->user->calls_to->semaphore);
     }
+
     free(thread_data->user->username);
     free(thread_data->user);
     pthread_mutex_unlock(&semaphore);

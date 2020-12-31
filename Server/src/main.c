@@ -22,8 +22,10 @@ int main(int argc, char* argv[])
     printf("INFO: \t Trying to set up server on port %d \n", SERVER_PORT);
     int server_socket_descriptor = SetupServerSocket();
     printf("INFO: \t Server is running on port %d \n", SERVER_PORT);
+
     UserListHead* list = create_list_head();
     ServerMainLoop(server_socket_descriptor, list);
+
     printf("INFO: \t Closing server\n");
     close(server_socket_descriptor);
     return(0);
