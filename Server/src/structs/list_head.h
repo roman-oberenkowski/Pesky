@@ -17,8 +17,8 @@
  * Head of users list
  */
 typedef struct UserListHead {
-    pthread_mutex_t semaphore;
-    struct UserList *next;
+    pthread_mutex_t mutex;
+    struct UserList *list;
 } UserListHead;
 
 /**

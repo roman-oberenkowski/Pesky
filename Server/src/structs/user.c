@@ -8,8 +8,8 @@ User *create_user() {
     User *user = (User *) malloc(sizeof(User));
     user->username = (char *) malloc(32 * sizeof(char));
     user->connection_descriptor = -1;
-    user->calls_to = NULL;
-    user->semaphore = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
+    user->connected_with = NULL;
+    user->mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
     return user;
 }
 
@@ -28,7 +28,7 @@ UserList *add_to_usr_list(UserList *list, User *user) {
 
 User *find_on_usr_list(UserList *list, char *username) {
     if (list == NULL || list->user == NULL) return NULL;
-    if (strcmp(list->user->username, username) == 0) return list->user;
+    if (list->user->username != NULL && strcmp(list->user->username, username) == 0) return list->user;
     return find_on_usr_list(list->next, username);
 }
 
@@ -45,7 +45,7 @@ UserList *remove_user_from_usr_list(UserList *list, User *user) {
 }
 
 void set_username(User *user, char *username) {
-    pthread_mutex_lock(&user->semaphore);
+    pthread_mutex_lock(&user->mutex);
     strcpy(user->username, username);
-    pthread_mutex_unlock(&user->semaphore);
+    pthread_mutex_unlock(&user->mutex);
 }
