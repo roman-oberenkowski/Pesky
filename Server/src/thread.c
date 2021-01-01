@@ -7,29 +7,30 @@
 void exitThread(struct thread_data_t *thread_data) {
     int descriptor;
     pthread_mutex_t semaphore;
-    pthread_mutex_lock(&thread_data->user->semaphore);
+    pthread_mutex_lock(&thread_data->user->mutex);
     if (DEBUG == 1)
         printf("INFO: \t Disconnecting user %s\n", thread_data->user->username);
 
-    semaphore = thread_data->user->semaphore;
+    semaphore = thread_data->user->mutex;
     descriptor = thread_data->user->connection_descriptor;
 
     remove_user_from_list(thread_data->list, thread_data->user);
-    if (thread_data->user->calls_to != NULL) {
-        pthread_mutex_lock(&thread_data->user->calls_to->semaphore);
+    if (thread_data->user->connected_with != NULL) {
+        pthread_mutex_lock(&thread_data->user->connected_with->mutex);
 
         if (DEBUG == 1)
             printf("INFO: \t Closing chat between %s and %s\n", thread_data->user->username,
-                   thread_data->user->calls_to->username);
-        sendDisconnectMessage(thread_data->user->calls_to, thread_data->user, 0);
-        thread_data->user->calls_to->calls_to = NULL;
+                   thread_data->user->connected_with->username);
+        sendDisconnectMessage(thread_data->user->connected_with, thread_data->user, 0);
+        thread_data->user->connected_with->connected_with = NULL;
 
-        pthread_mutex_unlock(&thread_data->user->calls_to->semaphore);
+        pthread_mutex_unlock(&thread_data->user->connected_with->mutex);
     }
 
     free(thread_data->user->username);
     free(thread_data->user);
     pthread_mutex_unlock(&semaphore);
+    shutdown(descriptor, SHUT_RDWR);
     close(descriptor);
     free(thread_data);
     if (DEBUG == 1)

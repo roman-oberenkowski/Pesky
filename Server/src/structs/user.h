@@ -20,8 +20,8 @@
 typedef struct User {
     char *username;
     int connection_descriptor;
-    struct User *calls_to;
-    pthread_mutex_t semaphore;
+    struct User *connected_with;
+    pthread_mutex_t mutex;
 } User;
 
 /**

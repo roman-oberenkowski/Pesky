@@ -11,19 +11,19 @@ void close_server() {
     User* user;
     if (list != NULL)
     {
-        pthread_mutex_lock(&list->semaphore);
-        while (list->next != NULL)
+        pthread_mutex_lock(&list->mutex);
+        while (list->list != NULL)
         {
-            pthread_mutex_lock(&list->next->user->semaphore);
-            user = list->next->user;
+            pthread_mutex_lock(&list->list->user->mutex);
+            user = list->list->user;
             shutdown(user->connection_descriptor, SHUT_RDWR);
             read(user->connection_descriptor, NULL, NULL);
             close(user->connection_descriptor);
-            list->next = remove_user_from_usr_list(list->next, user);
-            pthread_mutex_unlock(&user->semaphore);
+            list->list = remove_user_from_usr_list(list->list, user);
+            pthread_mutex_unlock(&user->mutex);
             free(user);
         }
-        pthread_mutex_unlock(&list->semaphore);
+        pthread_mutex_unlock(&list->mutex);
     }
     free(list);
     close(server_socket_descriptor);
