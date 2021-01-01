@@ -3,33 +3,41 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.ROFS.Controller">
    <children>
-      <Pane fx:id="loginPane" prefHeight="409.0" prefWidth="609.0" style="-fx-background-color: gray;">
+      <Pane fx:id="loginPane" prefHeight="409.0" prefWidth="609.0" style="-fx-background-color: gray;" visible="false">
          <children>
             <TextArea fx:id="ipField" layoutX="145.0" layoutY="57.0" prefColumnCount="1" prefHeight="34.0" prefRowCount="16" prefWidth="160.0" promptText="Please provide server IP" text="127.0.0.1" />
             <Label layoutX="120.0" layoutY="67.0" text="IP" />
-            <TextArea fx:id="usernameField" layoutX="106.0" layoutY="186.0" prefHeight="34.0" prefWidth="160.0" promptText="Please type your username" text="user" />
-            <Label layoutX="159.0" layoutY="153.0" text="Username" />
-            <Button fx:id="connectButton" layoutX="315.0" layoutY="63.0" mnemonicParsing="false" onAction="#connectButtonPressed" text="Connect!" />
-            <Button fx:id="hostButton" layoutX="554.0" layoutY="63.0" mnemonicParsing="false" onAction="#hostButtonPressed" text="Host" />
-            <TextArea fx:id="targetUserField" layoutX="286.0" layoutY="186.0" prefHeight="34.0" prefWidth="160.0" promptText="Please type your username" text="user2" />
-            <Button fx:id="startCallButton" layoutX="160.0" layoutY="243.0" mnemonicParsing="false" onAction="#startCallHandler" text="StartCall" />
-            <Button fx:id="joinCallButton" layoutX="340.0" layoutY="243.0" mnemonicParsing="false" onAction="#joinCallHandler" text="JoinCall" />
-            <Label layoutX="339.0" layoutY="162.0" text="Target user" />
+            <TextArea fx:id="usernameField" layoutX="160.0" layoutY="119.0" prefHeight="34.0" prefWidth="160.0" promptText="Please type your username" text="test" />
+            <Label layoutX="98.0" layoutY="128.0" text="Username" />
+            <Button fx:id="connectButton" layoutX="315.0" layoutY="63.0" mnemonicParsing="false" onAction="#connectButtonHandler" prefHeight="25.0" prefWidth="125.0" text="Connect!" />
+            <TextArea fx:id="targetUserField" layoutX="160.0" layoutY="186.0" prefHeight="34.0" prefWidth="160.0" promptText="Please type your username" text="test" />
+            <Button fx:id="setUsernameButton" layoutX="336.0" layoutY="125.0" mnemonicParsing="false" onAction="#setUsernameHandler" text="SetUsername" />
+            <Button fx:id="joinCallButton" layoutX="351.0" layoutY="192.0" mnemonicParsing="false" onAction="#joinCallHandler" text="JoinCall" />
+            <Label layoutX="90.0" layoutY="196.0" text="Target user" />
+            <Button fx:id="fastConnectButton" layoutX="315.0" layoutY="23.0" mnemonicParsing="false" onAction="#fastConnect" prefHeight="25.0" prefWidth="125.0" text="FastConnect(temp)" />
          </children>
       </Pane>
-      <Pane fx:id="callPane" prefHeight="409.0" prefWidth="609.0" style="-fx-background-color: green;" visible="false">
+      <Pane fx:id="callPane" prefHeight="409.0" prefWidth="609.0" style="-fx-background-color: whtie;">
          <children>
-            <Button layoutX="39.0" layoutY="36.0" mnemonicParsing="false" onAction="#startPlayingAudioClip" text="playClip" />
-            <ImageView fx:id="myView" fitHeight="203.0" fitWidth="272.0" layoutX="14.0" layoutY="192.0" pickOnBounds="true" preserveRatio="true" />
-            <ImageView fx:id="callerView" fitHeight="203.0" fitWidth="280.0" layoutX="315.0" layoutY="192.0" pickOnBounds="true" preserveRatio="true" />
-            <Button layoutX="39.0" layoutY="70.0" mnemonicParsing="false" onAction="#startCamera" text="StartCamera" />
-            <Button layoutX="143.0" layoutY="36.0" mnemonicParsing="false" onAction="#startRecordingMic" text="Capture microphone" />
+            <Button layoutX="438.0" layoutY="360.0" mnemonicParsing="false" onAction="#startPlayingAudioClip" text="playClip" />
+            <ImageView fx:id="myView" fitHeight="103.0" fitWidth="168.0" layoutY="298.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@camera.jpg" />
+               </image></ImageView>
+            <ImageView fx:id="callerView" fitHeight="294.0" fitWidth="436.0" layoutX="159.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@camera.jpg" />
+               </image></ImageView>
+            <Button layoutX="348.0" layoutY="360.0" mnemonicParsing="false" onAction="#startCamera" text="StartCamera" />
+            <Button layoutX="206.0" layoutY="360.0" mnemonicParsing="false" onAction="#startRecordingMic" text="Capture microphone" />
+            <TextArea fx:id="callerNameText" layoutX="4.0" layoutY="3.0" prefHeight="37.0" prefWidth="155.0" />
          </children>
       </Pane>
       <TextArea fx:id="logArea" layoutY="417.0" prefHeight="184.0" prefWidth="609.0" promptText="log info" />
