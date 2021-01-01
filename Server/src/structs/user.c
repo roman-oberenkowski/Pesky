@@ -28,7 +28,7 @@ UserList *add_to_usr_list(UserList *list, User *user) {
 
 User *find_on_usr_list(UserList *list, char *username) {
     if (list == NULL || list->user == NULL) return NULL;
-    if (strcmp(list->user->username, username) == 0) return list->user;
+    if (list->user->username != NULL && strcmp(list->user->username, username) == 0) return list->user;
     return find_on_usr_list(list->next, username);
 }
 
