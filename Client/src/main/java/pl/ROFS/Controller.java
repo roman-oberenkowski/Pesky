@@ -41,7 +41,6 @@ public class Controller {
     private Thread sendAudioThread;
     private Thread receiveFromServerThread;
     private Thread captureCameraThread;
-    private boolean privateServer=false;
     private final int soundBufferSize=10000;
     public void initialize() {
         callPane.setVisible(false);
@@ -53,6 +52,9 @@ public class Controller {
     public void connected(){
         startCallButton.setDisable(false);
         joinCallButton.setDisable(false);
+        setupAudioOutput();
+        receiveFromServerThread = new ReciveFromServerThread();
+        receiveFromServerThread.start();
     }
 
     public void startCallHandler(){
@@ -63,15 +65,6 @@ public class Controller {
         sendToServer("set_username",usernameField.getText());
         sendToServer("call_to",targetUserField.getText());
         setupAfterCallSuccessfull();
-    }
-
-    public void flushSpeakers(){
-        speakers.flush();
-    }
-
-    public void printAvailableSDL(){
-        System.out.println("sp ava: "+speakers.available()+" sp");
-
     }
 
     class CaptureCameraThread extends Thread{
@@ -268,27 +261,47 @@ public class Controller {
     }
 
     public void connectButtonPressed(ActionEvent actionEvent) {
-        logArea.setText("trying to connect\n");
-        try {
-            Socket clientSocket = new Socket(ipField.getText(), port);
-            OutputStream os = clientSocket.getOutputStream();
-            InputStream is = clientSocket.getInputStream();
-            writer = new PrintWriter(os, true);
-            reader = new BufferedReader(new InputStreamReader(is));
-        } catch (ConnectException e){
-            logArea.appendText("connection failed\n");
-            return;
-        }catch(UnknownHostException e){
-            logArea.appendText("incorrect server ip\n");
-            return;
+        connectButton.setDisable(true);
+        connectButton.setText("Connecting...");
+        new connectThread().start();
+    }
+
+    class connectThread extends Thread{
+        public void run(){
+            try {
+                Socket clientSocket = new Socket(ipField.getText(), port);
+                OutputStream os = clientSocket.getOutputStream();
+                InputStream is = clientSocket.getInputStream();
+                writer = new PrintWriter(os, true);
+                reader = new BufferedReader(new InputStreamReader(is));
+            } catch (ConnectException e){
+                connFailed("connection failed");
+                return;
+            }catch(UnknownHostException e){
+                connFailed("incorrect server ip");
+                return;
+            }
+            catch (IOException e) {
+                connFailed("unexpected IO Error");
+                return;
+            }
+            Platform.runLater(
+                    ()->{
+                        connectButton.setText("Connected :)");
+                    }
+            );
+            connected();
+
         }
-        catch (IOException e) {
-            e.printStackTrace();
-            logArea.appendText("unexpected IO Error\n");
-            return;
+        public void connFailed(String text){
+            logArea.appendText(text+"\n");
+            Platform.runLater(
+                ()-> {
+                    connectButton.setText("Connect");
+                    connectButton.setDisable(false);
+                }
+            );
         }
-        logArea.appendText("connected to server\n");
-        connected();
     }
 
     private void sendToServer(String type,String content){
@@ -313,7 +326,7 @@ public class Controller {
             e.printStackTrace();
         }
         logArea.appendText(" -> server started");
-        privateServer=true;
+        boolean privateServer = true;
         connected();
 
 
@@ -336,10 +349,6 @@ public class Controller {
     public void setupAfterCallSuccessfull() {
         callPane.setVisible(true);
         loginPane.setVisible(false);
-        setupAudioOutput();
-
-        receiveFromServerThread = new ReciveFromServerThread();
-        receiveFromServerThread.start();
     }
 
     public void exit(){
