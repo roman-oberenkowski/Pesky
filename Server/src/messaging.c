@@ -6,14 +6,14 @@
 
 void getContent(char *message, char *content) {
     if (message != NULL && strlen(message) > 7)
-        sscanf(message, "type:%*[^;];content:%s[^;];", content);
+        sscanf(message, "type:%*[^;];content:%s", content);
     else
         strcpy(content, "");
 }
 
 void getType(char *message, char *type) {
     if (message != NULL && strlen(message) > 7)
-        sscanf(message, "type:%[^;];content:%*s;", type);
+        sscanf(message, "type:%[^;];content:%*s", type);
     else
         strcpy(type, "undefined");
 }
@@ -39,7 +39,7 @@ void sendMessage(User *user, char message[], int size) {
 void sendConfirmMessage(User *user, char content[], int lock) {
     char message[MAX_CONFIRM_SIZE] = "type:confirm;content:";
     strcat(message, content);
-    strcat(message, ";\n");
+    strcat(message, "\n");
     if (lock == 1)
         sendMessage_lock(user, message, MAX_CONFIRM_SIZE);
     else
@@ -49,7 +49,7 @@ void sendConfirmMessage(User *user, char content[], int lock) {
 void sendErrorMessage(User *user, char content[], int lock) {
     char message[MAX_ERROR_SIZE] = "type:error;content:";
     strcat(message, content);
-    strcat(message, ";\n");
+    strcat(message, "\n");
     if (lock == 1)
         sendMessage_lock(user, message, MAX_ERROR_SIZE);
     else
@@ -59,7 +59,7 @@ void sendErrorMessage(User *user, char content[], int lock) {
 void sendJoinedMessage(User *receiver_user, User *caller_user, int lock) {
     char message[MAX_CONFIRM_SIZE] = "type:joined;content:";
     strcat(message, caller_user->username);
-    strcat(message, ";\n");
+    strcat(message, "\n");
     if (lock == 1)
         sendMessage_lock(receiver_user, message, MAX_CONFIRM_SIZE);
     else
@@ -69,7 +69,7 @@ void sendJoinedMessage(User *receiver_user, User *caller_user, int lock) {
 void sendDisconnectMessage(User *receiver_user, User *caller_user, int lock) {
     char message[MAX_CONFIRM_SIZE] = "type:disconnect;content:";
     strcat(message, caller_user->username);
-    strcat(message, ";\n");
+    strcat(message, "\n");
     if (lock == 1)
         sendMessage_lock(receiver_user, message, MAX_CONFIRM_SIZE);
     else
