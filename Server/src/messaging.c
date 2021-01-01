@@ -6,9 +6,9 @@
 
 void getContent(char *message, char *content) {
     if (message != NULL && strlen(message) > 7)
-        sscanf(message, "type:%*[^;];content:%s;", content);
+        sscanf(message, "type:%*[^;];content:%s[^;];", content);
     else
-        strcpy(content, "undefined");
+        strcpy(content, "");
 }
 
 void getType(char *message, char *type) {

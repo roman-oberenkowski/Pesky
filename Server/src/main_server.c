@@ -9,6 +9,7 @@ int SetupServerSocket() {
     struct sockaddr_in server_address;
     int bind_result, listen_sock;
     char reuse_addr_val = 1;
+    char reuse_port_val = 1;
     int server_socket_descriptor;
 
     memset(&server_address, 0, sizeof(struct sockaddr));
@@ -22,6 +23,7 @@ int SetupServerSocket() {
         exit(EXIT_FAILURE);
     }
     setsockopt(server_socket_descriptor, SOL_SOCKET, SO_REUSEADDR, (char *) &reuse_addr_val, sizeof(reuse_addr_val));
+    setsockopt(server_socket_descriptor, SOL_SOCKET, SO_REUSEPORT, (char *) &reuse_port_val, sizeof(reuse_port_val));
 
     bind_result = bind(server_socket_descriptor, (struct sockaddr *) &server_address, sizeof(struct sockaddr));
     if (bind_result < 0) {
