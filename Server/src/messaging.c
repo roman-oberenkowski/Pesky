@@ -136,7 +136,7 @@ int processCallToMessage(struct thread_data_t *thread_data, char *message, char 
                 user->calls_to = thread_data->user;
                 thread_data->user->calls_to = user;
                 sendJoinedMessage(user, thread_data->user, 0);
-                sendConfirmMessage(thread_data->user, "Successfully changed username", 0);
+                sendConfirmMessage(thread_data->user, "Successfully called user", 0);
                 if (DEBUG == 1)
                     printf("INFO: \t User \"%s\" called to \"%s\"\n", thread_data->user->username, user->username);
             } else {
@@ -148,7 +148,7 @@ int processCallToMessage(struct thread_data_t *thread_data, char *message, char 
         } else {
             sendErrorMessage(thread_data->user, "User with this username does not exists", 0);
             if (DEBUG == 1)
-                printf("ERROR: \t User \"%s\" is in another conversation\n", user->username);
+                printf("ERROR: \t User \"%s\" does not exists\n", content);
         }
         pthread_mutex_unlock(&thread_data->user->semaphore);
         pthread_mutex_unlock(&thread_data->list->semaphore);
