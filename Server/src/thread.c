@@ -51,7 +51,8 @@ void *ThreadBehavior(void *t_data) {
     while ((size = read(th_data->user->connection_descriptor, incoming_data, MAX_INCOMING_SIZE)) > 0) {
         if (DEBUG == 1)
             printf("INFO: \t Recieved message: %s\n", incoming_data);
-        incoming_data[size] = '\0';
+        if (size != MAX_INCOMING_SIZE)
+            incoming_data[size] = '\0';
         strcat(user_data, incoming_data);
 
         while (strchr(user_data, MSG_DELIMITER_CHR) != NULL) {
