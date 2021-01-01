@@ -24,7 +24,7 @@
             <Button fx:id="fastConnectButton" layoutX="315.0" layoutY="23.0" mnemonicParsing="false" onAction="#fastConnect" prefHeight="25.0" prefWidth="125.0" text="FastConnect(temp)" />
          </children>
       </Pane>
-      <Pane fx:id="callPane" prefHeight="409.0" prefWidth="609.0" style="-fx-background-color: whtie;">
+      <Pane fx:id="callPane" prefHeight="409.0" prefWidth="609.0" style="-fx-background-color: white;">
          <children>
             <Button layoutX="438.0" layoutY="360.0" mnemonicParsing="false" onAction="#startPlayingAudioClip" text="playClip" />
             <ImageView fx:id="myView" fitHeight="103.0" fitWidth="168.0" layoutY="298.0" pickOnBounds="true" preserveRatio="true">
