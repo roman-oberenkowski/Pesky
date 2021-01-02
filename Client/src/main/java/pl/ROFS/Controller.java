@@ -1,9 +1,7 @@
 package pl.ROFS;
 
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -18,8 +16,6 @@ import java.net.*;
 import java.util.Arrays;
 import javax.xml.bind.DatatypeConverter;
 import com.github.sarxos.webcam.Webcam;
-
-import static java.lang.Math.min;
 
 
 public class Controller {
@@ -43,7 +39,7 @@ public class Controller {
     private Webcam webcam;
     private Thread sendAudioThread;
     private final int soundBufferSize=10000;
-    private boolean isUsernameSet=false;
+    private boolean audioOutputOK=false;
 
     public void initialize() {
         callPane.setVisible(false);
@@ -54,9 +50,7 @@ public class Controller {
 
     public void connected(){
         Platform.runLater(
-                ()->{
-                    connectButton.setText("Connected :)");
-                }
+                ()-> connectButton.setText("Connected :)")
         );
         ipField.setDisable(true);
         setUsernameButton.setDisable(false);
@@ -64,7 +58,6 @@ public class Controller {
     }
 
     public void usernameSet(){
-        isUsernameSet=true;
         setUsernameButton.setDisable(true);
         usernameField.setDisable(true);
         joinCallButton.setDisable(false);
@@ -73,11 +66,12 @@ public class Controller {
     public void setUsernameHandler(){
         sendToServer("set_username",usernameField.getText());
     }
+
     public void joinCallHandler(){
         sendToServer("call_to",targetUserField.getText());
     }
 
-    public void fastConnect(ActionEvent actionEvent) {
+    public void fastConnect() {
         ipField.setText("192.168.1.23");
         connectButtonHandler();
     }
@@ -87,7 +81,7 @@ public class Controller {
         loginPane.setVisible(false);
     }
 
-    public void exit(){
+    public void global_exit(){
         Platform.exit();
         System.exit(0);
     }
@@ -135,12 +129,13 @@ public class Controller {
     private class SendMicrophoneThread extends Thread{
         public void run(){
             DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, getAudioFormat());
-            TargetDataLine targetDataLine = null;
+            TargetDataLine targetDataLine;
             try {
                 targetDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
                 targetDataLine.open(getAudioFormat());
             } catch (LineUnavailableException e) {
-                e.printStackTrace();
+                logArea.appendText("cannot access your microphone\n");
+                return;
             }
             targetDataLine.start();
             byte[] tempBuffer = new byte[soundBufferSize];
@@ -176,8 +171,9 @@ public class Controller {
             speakers = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
             speakers.open(audioFormat);
             speakers.start();
+            audioOutputOK=true;
         } catch (LineUnavailableException e) {
-            e.printStackTrace();
+            audioOutputOK=false;
         }
     }
 
@@ -221,10 +217,20 @@ public class Controller {
         }
     }
 
+    private void disconnectedHandler(){
+        global_exit();
+    }
+
     private void sendToServer(String type,String content){
         String msg="type:"+type+";content:"+content;
         synchronized (writer) {
-            writer.println(msg);
+            try{
+                writer.println(msg);
+            } catch(Exception e){
+                System.out.println("writing got problem");
+                e.printStackTrace();
+                global_exit();
+            }
         }
     }
 
@@ -237,22 +243,22 @@ public class Controller {
                 String content;
                 String type;
                 String serverMessage="";
-                String [] splited;
+                String [] cut_message;
                 String right;
 
                 while(true){
                     try{
                         serverMessage = reader.readLine();
                     } catch(SocketException | SocketTimeoutException e){
-                        exit();
+                        disconnectedHandler();
                     }
                     try {
-                        splited = serverMessage.split(";");
-                        type = splited[0].split(":")[1];
-                        right = splited[1];
+                        cut_message = serverMessage.split(";");
+                        type = cut_message[0].split(":")[1];
+                        right = cut_message[1];
                     }
                     catch(ArrayIndexOutOfBoundsException e){
-                        logArea.appendText("message format error! ommiting -> "+serverMessage+"\n");
+                        logArea.appendText("Message format error! omitting -> "+serverMessage+"\n");
                         continue;
                     }
                     try {
@@ -267,28 +273,34 @@ public class Controller {
                             callerNameText.setText("Talking with: "+content);
                             logArea.appendText("Joined "+content);
                             break;
+
                         case "audio":
+                            if (!audioOutputOK) break; //don't process received audio when audio output setup failed
                             decodedContent = DatatypeConverter.parseBase64Binary(content);
                             if(speakers.available()<soundBufferSize){
                                 speakers.flush();
-                                System.out.println("Reciving audio would block -> flushed!");
+                                System.out.println("Receiving audio would block -> flushed!");
                             }else{
-                                speakers.write(decodedContent, 0, min(decodedContent.length,speakers.available()));
+                                speakers.write(decodedContent, 0, decodedContent.length);
                             }
                             break;
+
                         case "video":
                             decodedContent = DatatypeConverter.parseBase64Binary(content);
                             InputStream is = new ByteArrayInputStream(decodedContent);
                             BufferedImage image = ImageIO.read(is);
                             callerView.setImage(SwingFXUtils.toFXImage(image, null));
                             break;
+
                         case "disconnect":
-                            System.out.println("Exiting because server said so ;)");
-                            exit();
+                            System.out.println("Exiting because server said so");
+                            global_exit();
                             break;
+
                         case "error":
                             logArea.appendText(content+"\n");
                             break;
+
                         case "confirm":
                             logArea.appendText(content+"\n");
                             if(content.equals("Successfully changed username")){
@@ -298,16 +310,17 @@ public class Controller {
                                 goToCallView();
                                 callerNameText.setText("Talking with: "+targetUserField.getText());
                             }
-
                             break;
-                        default:
-                            logArea.appendText("type error in recived message! -> "+type+"\n");
 
+                        default:
+                            logArea.appendText("type error in received message! -> "+type+"\n");
                     }
                 }
 
             } catch (IOException e) {
+                System.out.println("receive from server got problems");
                 e.printStackTrace();
+                global_exit();
             }
         }
     }
@@ -334,9 +347,7 @@ public class Controller {
                     }
                     Thread.sleep(56);
                 }
-            } catch (IOException | UnsupportedAudioFileException  e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
+            } catch (IOException | UnsupportedAudioFileException | InterruptedException e) {
                 e.printStackTrace();
             }
         }
