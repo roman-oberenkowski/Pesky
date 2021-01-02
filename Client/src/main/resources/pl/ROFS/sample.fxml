@@ -13,22 +13,22 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.ROFS.Controller">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: transparent; -fx-effect: dropshadow(three-pass-box, black, 10, 0, 0, 0);" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.ROFS.Controller">
    <children>
       <AnchorPane style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <children>
-            <AnchorPane fx:id="loginPane" layoutX="319.0" layoutY="83.0" prefHeight="300.0" prefWidth="326.0" style="-fx-background-color: white; -fx-background-radius: 1em;" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="244.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="20.0">
+            <AnchorPane layoutX="319.0" layoutY="83.0" prefHeight="300.0" prefWidth="326.0" style="-fx-background-color: white; -fx-background-radius: 1em;" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="244.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="20.0">
                <children>
-                  <AnchorPane fx:id="connectionPane" layoutX="50.0" prefHeight="340.0" prefWidth="276.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <AnchorPane fx:id="connectionPane" layoutX="50.0" prefHeight="340.0" prefWidth="276.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
                         <Label layoutX="31.0" layoutY="22.0" prefHeight="26.0" prefWidth="152.0" text="Connect to server" textFill="#434343" AnchorPane.leftAnchor="32.0" AnchorPane.topAnchor="30.0">
                            <font>
                               <Font size="16.0" />
                            </font>
                         </Label>
-                        <JFXTextField fx:id="addressField" focusColor="#f05d5e" labelFloat="true" layoutX="32.0" layoutY="144.0" prefHeight="26.0" prefWidth="276.0" promptText="Server address" text="127.0.0.1" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="20.0" />
-                        <Label fx:id="connectionError" layoutX="32.0" layoutY="183.0" prefHeight="16.0" prefWidth="225.0" text="Connection error" textFill="#f05d5e" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="20.0" />
-                        <JFXButton fx:id="connectButton" buttonType="RAISED" layoutX="145.0" layoutY="291.0" prefHeight="26.0" prefWidth="112.0" ripplerFill="#d0d0d0" style="-fx-background-color: E7ECEF; -fx-background-radius: 0.5em;" text="Connect" textFill="#434343" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0">
+                        <JFXTextField fx:id="addressField" focusColor="#f05d5e" labelFloat="true" layoutX="32.0" layoutY="144.0" prefHeight="26.0" prefWidth="276.0" promptText="Server address" text="192.168.1.23" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="20.0" />
+                        <Label fx:id="connectionError" layoutX="32.0" layoutY="183.0" prefHeight="16.0" prefWidth="225.0" textFill="#f05d5e" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="20.0" />
+                        <JFXButton fx:id="connectButton" buttonType="RAISED" layoutX="145.0" layoutY="291.0" onAction="#connectButtonHandler" prefHeight="26.0" prefWidth="112.0" ripplerFill="#d0d0d0" style="-fx-background-color: E7ECEF; -fx-background-radius: 0.5em;" text="Connect" textFill="#434343" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -43,15 +43,15 @@
                            </font>
                         </Label>
                         <JFXTextField fx:id="usernameField" focusColor="#f05d5e" labelFloat="true" layoutX="32.0" layoutY="144.0" prefHeight="26.0" prefWidth="276.0" promptText="Username" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="20.0" />
-                        <Label fx:id="signinError" layoutX="32.0" layoutY="183.0" prefHeight="16.0" prefWidth="225.0" text="This username is unavailable" textFill="#f05d5e" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="20.0" />
-                        <JFXButton fx:id="setUsernameButton" buttonType="RAISED" layoutX="145.0" layoutY="291.0" prefHeight="26.0" prefWidth="112.0" ripplerFill="#d0d0d0" style="-fx-background-color: E7ECEF; -fx-background-radius: 0.5em;" text="Sign In" textFill="#434343" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0">
+                        <Label fx:id="signinError" layoutX="32.0" layoutY="183.0" prefHeight="16.0" prefWidth="225.0" textFill="#f05d5e" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="20.0" />
+                        <JFXButton fx:id="setUsernameButton" buttonType="RAISED" layoutX="145.0" layoutY="291.0" onAction="#setUsernameHandler" prefHeight="26.0" prefWidth="112.0" ripplerFill="#d0d0d0" style="-fx-background-color: E7ECEF; -fx-background-radius: 0.5em;" text="Sign In" textFill="#434343" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </JFXButton>
                      </children>
                   </AnchorPane>
-                  <AnchorPane fx:id="calltoPane" layoutX="70.0" layoutY="20.0" prefHeight="340.0" prefWidth="276.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <AnchorPane fx:id="calltoPane" layoutX="70.0" layoutY="20.0" prefHeight="340.0" prefWidth="276.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
                         <Label layoutX="31.0" layoutY="22.0" prefHeight="26.0" prefWidth="232.0" text="Wait for a call" textFill="#434343" AnchorPane.leftAnchor="32.0" AnchorPane.topAnchor="30.0">
                            <font>
@@ -65,8 +65,8 @@
                            </font>
                         </Label>
                         <JFXTextField fx:id="calltoField" focusColor="#f05d5e" labelFloat="true" layoutX="26.0" layoutY="198.0" prefHeight="26.0" prefWidth="276.0" promptText="Username" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="20.0" />
-                        <Label fx:id="callError" layoutX="26.0" layoutY="235.0" prefHeight="16.0" prefWidth="225.0" text="This user does not exists" textFill="#f05d5e" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="20.0" />
-                        <JFXButton fx:id="callButton" buttonType="RAISED" layoutX="144.0" layoutY="292.0" prefHeight="26.0" prefWidth="112.0" ripplerFill="#d0d0d0" style="-fx-background-color: E7ECEF; -fx-background-radius: 0.5em;" text="Call" textFill="#434343" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0">
+                        <Label fx:id="callError" layoutX="26.0" layoutY="235.0" prefHeight="16.0" prefWidth="225.0" textFill="#f05d5e" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="20.0" />
+                        <JFXButton fx:id="callButton" buttonType="RAISED" layoutX="144.0" layoutY="292.0" onAction="#joinCallHandler" prefHeight="26.0" prefWidth="112.0" ripplerFill="#d0d0d0" style="-fx-background-color: E7ECEF; -fx-background-radius: 0.5em;" text="Call" textFill="#434343" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -106,14 +106,14 @@
             </AnchorPane>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="callPane" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #247BA0; -fx-background-radius: 1em;" visible="false" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+      <AnchorPane fx:id="callPane" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #247BA0; -fx-background-radius: 1em;" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <children>
-            <AnchorPane layoutY="324.0" prefHeight="56.0" prefWidth="580.0" style="-fx-background-color: #1D3461; -fx-background-radius: 0 0 10 10;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+            <AnchorPane layoutY="324.0" prefHeight="56.0" prefWidth="580.0" style="-fx-background-color: #1D3461; -fx-background-radius: 0 0 10 10; -fx-effect: dropshadow(three-pass-box, black, 10, 0, 0, 0);" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                <children>
                   <FlowPane alignment="CENTER" columnHalignment="CENTER" layoutX="70.0" layoutY="-5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <JFXToggleButton fx:id="cameraToggle" alignment="CENTER_LEFT" prefHeight="56.0" prefWidth="155.0" size="8.0" text="Camera" textFill="#f2f2f2" toggleColor="#227396" toggleLineColor="#247ba0" />
-                        <JFXButton fx:id="disconnectButton" alignment="CENTER" buttonType="RAISED" contentDisplay="CENTER" prefHeight="44.0" prefWidth="47.0" ripplerFill="#c9c9c9" style="-fx-background-radius: 2em; -fx-background-color: #F05D5E;" text="⠀">
+                        <JFXToggleButton fx:id="cameraToggle" alignment="CENTER_LEFT" onAction="#cameraHandler" prefHeight="56.0" prefWidth="155.0" size="8.0" text="Camera" textFill="#f2f2f2" toggleColor="#227396" toggleLineColor="#247ba0" />
+                        <JFXButton fx:id="disconnectButton" alignment="CENTER" buttonType="RAISED" contentDisplay="CENTER" onAction="#disconnectHandler" prefHeight="44.0" prefWidth="47.0" ripplerFill="#c9c9c9" style="-fx-background-radius: 2em; -fx-background-color: #F05D5E;" text="⠀">
                            <graphic>
                               <ImageView fitHeight="26.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -122,7 +122,7 @@
                               </ImageView>
                            </graphic>
                         </JFXButton>
-                        <JFXToggleButton fx:id="microphoneToggle" alignment="CENTER_RIGHT" prefHeight="56.0" prefWidth="189.0" size="8.0" text="Microphone" textFill="#f2f2f2" toggleColor="#227396" toggleLineColor="#247ba0" />
+                        <JFXToggleButton fx:id="microphoneToggle" alignment="CENTER_RIGHT" onAction="#microphoneToggleHander" prefHeight="56.0" prefWidth="189.0" size="8.0" text="Microphone" textFill="#f2f2f2" toggleColor="#227396" toggleLineColor="#247ba0" />
                      </children>
                   </FlowPane>
                </children>
@@ -133,8 +133,14 @@
                </font>
             </Label>
             <Label fx:id="videocallError" layoutX="7.0" layoutY="308.0" prefHeight="16.0" prefWidth="556.0" style="-fx-effect: dropshadow(three-pass-box, black, 10, 0, 0, 0);" text="Error has occured" textFill="#ffd3d3" AnchorPane.bottomAnchor="56.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
-            <ImageView fx:id="callerView" fitHeight="324.0" fitWidth="580.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="56.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-            <ImageView fx:id="myView" fitHeight="67.0" fitWidth="97.0" layoutX="483.0" layoutY="257.0" pickOnBounds="true" preserveRatio="true" style="-fx-effect: dropshadow(three-pass-box, black, 10, 0, 0, 0);" AnchorPane.bottomAnchor="61.0" AnchorPane.rightAnchor="5.0" />
+            <ImageView fx:id="callerView" fitHeight="322.0" fitWidth="580.0" layoutY="13.0" pickOnBounds="true" AnchorPane.bottomAnchor="58.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <image>
+                  <Image url="@camera.jpg" />
+               </image></ImageView>
+            <ImageView fx:id="myView" fitHeight="67.0" fitWidth="97.0" layoutX="483.0" layoutY="257.0" pickOnBounds="true" preserveRatio="true" style="-fx-effect: dropshadow(three-pass-box, black, 10, 0, 0, 0);" AnchorPane.bottomAnchor="61.0" AnchorPane.rightAnchor="5.0">
+               <image>
+                  <Image url="@camera.jpg" />
+               </image></ImageView>
          </children>
       </AnchorPane>
    </children>
