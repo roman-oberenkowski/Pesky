@@ -35,7 +35,7 @@
                         </JFXButton>
                      </children>
                   </AnchorPane>
-                  <AnchorPane fx:id="signinPane" layoutX="60.0" layoutY="10.0" prefHeight="340.0" prefWidth="276.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <AnchorPane fx:id="signInPane" layoutX="60.0" layoutY="10.0" prefHeight="340.0" prefWidth="276.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
                         <Label layoutX="31.0" layoutY="22.0" prefHeight="26.0" prefWidth="152.0" text="Sign In" textFill="#434343" AnchorPane.leftAnchor="32.0" AnchorPane.topAnchor="30.0">
                            <font>
@@ -43,7 +43,7 @@
                            </font>
                         </Label>
                         <JFXTextField fx:id="usernameField" focusColor="#f05d5e" labelFloat="true" layoutX="32.0" layoutY="144.0" prefHeight="26.0" prefWidth="276.0" promptText="Username" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="20.0" />
-                        <Label fx:id="signinError" layoutX="32.0" layoutY="183.0" prefHeight="16.0" prefWidth="225.0" textFill="#f05d5e" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="20.0" />
+                        <Label fx:id="signInError" layoutX="32.0" layoutY="183.0" prefHeight="16.0" prefWidth="225.0" textFill="#f05d5e" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="20.0" />
                         <JFXButton fx:id="setUsernameButton" buttonType="RAISED" layoutX="145.0" layoutY="291.0" onAction="#setUsernameHandler" prefHeight="26.0" prefWidth="112.0" ripplerFill="#d0d0d0" style="-fx-background-color: E7ECEF; -fx-background-radius: 0.5em;" text="Sign In" textFill="#434343" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0">
                            <font>
                               <Font size="14.0" />
@@ -51,7 +51,7 @@
                         </JFXButton>
                      </children>
                   </AnchorPane>
-                  <AnchorPane fx:id="calltoPane" layoutX="70.0" layoutY="20.0" prefHeight="340.0" prefWidth="276.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <AnchorPane fx:id="callToPane" layoutX="70.0" layoutY="20.0" prefHeight="340.0" prefWidth="276.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
                         <Label layoutX="31.0" layoutY="22.0" prefHeight="26.0" prefWidth="232.0" text="Wait for a call" textFill="#434343" AnchorPane.leftAnchor="32.0" AnchorPane.topAnchor="30.0">
                            <font>
@@ -64,8 +64,8 @@
                               <Font size="14.0" />
                            </font>
                         </Label>
-                        <JFXTextField fx:id="calltoField" focusColor="#f05d5e" labelFloat="true" layoutX="26.0" layoutY="198.0" prefHeight="26.0" prefWidth="276.0" promptText="Username" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="20.0" />
-                        <Label fx:id="callError" layoutX="26.0" layoutY="235.0" prefHeight="16.0" prefWidth="225.0" textFill="#f05d5e" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="20.0" />
+                        <JFXTextField fx:id="callToField" focusColor="#f05d5e" labelFloat="true" layoutX="26.0" layoutY="198.0" prefHeight="26.0" prefWidth="276.0" promptText="Username" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="20.0" />
+                        <Label fx:id="callToError" layoutX="26.0" layoutY="235.0" prefHeight="16.0" prefWidth="225.0" textFill="#f05d5e" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="20.0" />
                         <JFXButton fx:id="callButton" buttonType="RAISED" layoutX="144.0" layoutY="292.0" onAction="#joinCallHandler" prefHeight="26.0" prefWidth="112.0" ripplerFill="#d0d0d0" style="-fx-background-color: E7ECEF; -fx-background-radius: 0.5em;" text="Call" textFill="#434343" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0">
                            <font>
                               <Font size="14.0" />
@@ -122,7 +122,7 @@
                               </ImageView>
                            </graphic>
                         </JFXButton>
-                        <JFXToggleButton fx:id="microphoneToggle" alignment="CENTER_RIGHT" onAction="#microphoneToggleHander" prefHeight="56.0" prefWidth="189.0" size="8.0" text="Microphone" textFill="#f2f2f2" toggleColor="#227396" toggleLineColor="#247ba0" />
+                        <JFXToggleButton fx:id="microphoneToggle" alignment="CENTER_RIGHT" onAction="#microphoneToggleHandler" prefHeight="56.0" prefWidth="189.0" size="8.0" text="Microphone" textFill="#f2f2f2" toggleColor="#227396" toggleLineColor="#247ba0" />
                      </children>
                   </FlowPane>
                </children>
@@ -132,7 +132,7 @@
                   <Font size="20.0" />
                </font>
             </Label>
-            <Label fx:id="videocallError" layoutX="7.0" layoutY="308.0" prefHeight="16.0" prefWidth="556.0" style="-fx-effect: dropshadow(three-pass-box, black, 10, 0, 0, 0);" text="Error has occured" textFill="#ffd3d3" AnchorPane.bottomAnchor="56.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
+            <Label fx:id="inCallError" layoutX="7.0" layoutY="308.0" prefHeight="16.0" prefWidth="556.0" style="-fx-effect: dropshadow(three-pass-box, black, 10, 0, 0, 0);" text="Error has occured" textFill="#ffd3d3" AnchorPane.bottomAnchor="56.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
             <ImageView fx:id="callerView" fitHeight="322.0" fitWidth="580.0" layoutY="13.0" pickOnBounds="true" AnchorPane.bottomAnchor="58.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <image>
                   <Image url="@camera.jpg" />
