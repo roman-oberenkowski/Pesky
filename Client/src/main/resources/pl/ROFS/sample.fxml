@@ -41,6 +41,6 @@
          </children>
       </Pane>
       <TextArea fx:id="logArea" layoutY="417.0" prefHeight="184.0" prefWidth="609.0" promptText="log info" />
-      <Button layoutX="569.0" layoutY="417.0" mnemonicParsing="false" onAction="#exit" text="Exit" />
+      <Button layoutX="569.0" layoutY="417.0" mnemonicParsing="false" onAction="#global_exit" text="Exit" />
    </children>
 </AnchorPane>
