@@ -1,9 +1,14 @@
 package pl.ROFS;
 
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.JFXToggleButton;
 import javafx.application.Platform;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.embed.swing.SwingFXUtils;
 
@@ -20,19 +25,27 @@ import com.github.sarxos.webcam.Webcam;
 
 public class Controller {
     private final int port = 1235;
-    public Pane loginPane;
-    public Pane callPane;
-    public TextArea ipField;
-    public TextArea usernameField;
-    public Button connectButton;
-    public ImageView myView;
+    public AnchorPane loginPane;
+    public AnchorPane connectionPane;
+    public JFXTextField addressField;
+    public JFXTextField usernameField;
+    public Label connectionError;
+    public JFXButton connectButton;
+    public AnchorPane signinPane;
+    public Label signinError;
+    public JFXButton setUsernameButton;
+    public AnchorPane calltoPane;
+    public JFXTextField calltoField;
+    public Label callError;
+    public JFXButton callButton;
+    public JFXToggleButton cameraToggle;
+    public JFXButton disconnectButton;
+    public JFXToggleButton microphoneToggle;
+    public Label callerNameText;
+    public Label videocallError;
     public ImageView callerView;
-    public TextArea logArea;
-    public TextArea targetUserField;
-    public Button setUsernameButton;
-    public Button joinCallButton;
-    public Button fastConnectButton;
-    public TextArea callerNameText;
+    public ImageView myView;
+
     PrintWriter writer;
     BufferedReader reader;
     private SourceDataLine speakers;
@@ -42,17 +55,17 @@ public class Controller {
     private boolean audioOutputOK=false;
 
     public void initialize() {
-        callPane.setVisible(false);
+        calltoPane.setVisible(false);
         loginPane.setVisible(true);
         setUsernameButton.setDisable(true);
-        joinCallButton.setDisable(true);
+        callButton.setDisable(true);
     }
 
     public void connected(){
         Platform.runLater(
                 ()-> connectButton.setText("Connected :)")
         );
-        ipField.setDisable(true);
+        addressField.setDisable(true);
         setUsernameButton.setDisable(false);
         new ReceiveFromServerThread().start();
     }
@@ -60,7 +73,7 @@ public class Controller {
     public void usernameSet(){
         setUsernameButton.setDisable(true);
         usernameField.setDisable(true);
-        joinCallButton.setDisable(false);
+        callButton.setDisable(false);
     }
 
     public void setUsernameHandler(){
@@ -68,16 +81,16 @@ public class Controller {
     }
 
     public void joinCallHandler(){
-        sendToServer("call_to",targetUserField.getText());
+        sendToServer("call_to",calltoField.getText());
     }
 
     public void fastConnect() {
-        ipField.setText("192.168.1.23");
+        addressField.setText("192.168.1.23");
         connectButtonHandler();
     }
 
     public void goToCallView() {
-        callPane.setVisible(true);
+        calltoPane.setVisible(true);
         loginPane.setVisible(false);
     }
 
@@ -134,7 +147,7 @@ public class Controller {
                 targetDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
                 targetDataLine.open(getAudioFormat());
             } catch (LineUnavailableException e) {
-                logArea.appendText("cannot access your microphone\n");
+                //logArea.appendText("cannot access your microphone\n");
                 return;
             }
             targetDataLine.start();
@@ -179,7 +192,6 @@ public class Controller {
 
     //NETWORK
     public void connectButtonHandler() {
-        fastConnectButton.setDisable(true);
         connectButton.setDisable(true);
         connectButton.setText("Connecting...");
         new connectThread().start();
@@ -188,7 +200,7 @@ public class Controller {
     class connectThread extends Thread{
         public void run(){
             try {
-                Socket clientSocket = new Socket(ipField.getText(), port);
+                Socket clientSocket = new Socket(addressField.getText(), port);
                 OutputStream os = clientSocket.getOutputStream();
                 InputStream is = clientSocket.getInputStream();
                 writer = new PrintWriter(os, true);
@@ -207,7 +219,7 @@ public class Controller {
             connected();
         }
         public void connFailed(String text){
-            logArea.appendText(text+"\n");
+            //logArea.appendText(text+"\n");
             Platform.runLater(
                     ()-> {
                         connectButton.setText("Connect");
@@ -258,7 +270,7 @@ public class Controller {
                         right = cut_message[1];
                     }
                     catch(ArrayIndexOutOfBoundsException e){
-                        logArea.appendText("Message format error! omitting -> "+serverMessage+"\n");
+                        //logArea.appendText("Message format error! omitting -> "+serverMessage+"\n");
                         continue;
                     }
                     try {
@@ -271,7 +283,7 @@ public class Controller {
                         case "joined":
                             goToCallView();
                             callerNameText.setText("Talking with: "+content);
-                            logArea.appendText("Joined "+content);
+//                            logArea.appendText("Joined "+content);
                             break;
 
                         case "audio":
@@ -298,22 +310,22 @@ public class Controller {
                             break;
 
                         case "error":
-                            logArea.appendText(content+"\n");
+//                            logArea.appendText(content+"\n");
                             break;
 
                         case "confirm":
-                            logArea.appendText(content+"\n");
+//                            logArea.appendText(content+"\n");
                             if(content.equals("Successfully changed username")){
                                 usernameSet();
                             }
                             if(content.equals("Successfully called user")){
                                 goToCallView();
-                                callerNameText.setText("Talking with: "+targetUserField.getText());
+                                callerNameText.setText("Talking with: "+calltoField.getText());
                             }
                             break;
 
                         default:
-                            logArea.appendText("type error in received message! -> "+type+"\n");
+                            //logArea.appendText("type error in received message! -> "+type+"\n");
                     }
                 }
 

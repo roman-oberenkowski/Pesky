@@ -7,7 +7,8 @@ module pl.ROFS {
     requires webcam.capture;
     requires javafx.swing;
     requires java.xml.bind;
-
+    requires javafx.graphics;
+    requires com.jfoenix;
 
     opens pl.ROFS to javafx.fxml;
     exports pl.ROFS;
