@@ -1,9 +1,9 @@
 # Pesky
 Projekt komunikatora audio-video na laboratoria z Sieci Komputerowych
 
-## Kompilacja
+## Kompilacja i uruchamianie
 - Klient - Java 11 z Mavenem - `mvn javafx:run`.
-- Serwer - C11 - `gcc src/main.c src/constants.h src/main_server.c src/main_server.h src/thread.c src/thread.h src/messaging.c src/messaging.h src/structs/list_head.c src/structs/list_head.h src/structs/user.c src/structs/user.h -l pthread -o server -Wall` bądź też z wykorzystaniem make.
+- Serwer - C11 - `gcc src/main.c src/constants.h src/main_server.c src/main_server.h src/thread.c src/thread.h src/messaging.c src/messaging.h src/structs/list_head.c src/structs/list_head.h src/structs/user.c src/structs/user.h -l pthread -o server -Wall` bądź też z wykorzystaniem make. W celu uruchomienia tak skompilowanego projektu wystarczy uruchomić plik `./server`.
 
 ## Protokuł komunikacyjny
 Wiadomości wysyłane przez projekt mają stałą, ustaloną strukturę `type:<typ_wiadomości>;content:<zawartość>\n`. 
