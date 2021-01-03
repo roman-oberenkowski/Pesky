@@ -127,12 +127,6 @@
                   </FlowPane>
                </children>
             </AnchorPane>
-            <Label fx:id="callerNameText" layoutX="7.0" layoutY="6.0" opacity="0.92" style="-fx-effect: dropshadow(three-pass-box, black, 10, 0, 0, 0);" text="User" textFill="#f2f2f2" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
-               <font>
-                  <Font size="20.0" />
-               </font>
-            </Label>
-            <Label fx:id="inCallError" layoutX="7.0" layoutY="308.0" prefHeight="16.0" prefWidth="556.0" style="-fx-effect: dropshadow(three-pass-box, black, 10, 0, 0, 0);" text="Error has occured" textFill="#ffd3d3" AnchorPane.bottomAnchor="56.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
             <ImageView fx:id="callerView" fitHeight="322.0" fitWidth="580.0" layoutY="13.0" pickOnBounds="true" AnchorPane.bottomAnchor="58.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <image>
                   <Image url="@camera.jpg" />
@@ -141,6 +135,12 @@
                <image>
                   <Image url="@camera.jpg" />
                </image></ImageView>
+            <Label fx:id="inCallError" layoutX="7.0" layoutY="308.0" prefHeight="16.0" prefWidth="556.0" style="-fx-effect: dropshadow(three-pass-box, black, 10, 0, 0, 0);" textFill="#ffd3d3" AnchorPane.bottomAnchor="56.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
+            <Label fx:id="callerNameText" layoutX="7.0" layoutY="6.0" opacity="0.92" style="-fx-effect: dropshadow(three-pass-box, black, 10, 0, 0, 0);" text="User" textFill="#f2f2f2" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
+               <font>
+                  <Font size="20.0" />
+               </font>
+            </Label>
          </children>
       </AnchorPane>
    </children>

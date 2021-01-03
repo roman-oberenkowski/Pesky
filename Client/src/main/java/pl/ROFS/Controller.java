@@ -49,7 +49,7 @@ public class Controller {
     BufferedReader reader;
     private SourceDataLine speakers;
     private Webcam webcam;
-    private final int soundBufferSize=10000;
+    private final int soundBufferSize=1000;
     private boolean audioOutputOK=false;
     private final Semaphore cameraSemaphore = new Semaphore(2, false);
     Thread captureCameraThread;
@@ -154,25 +154,36 @@ public class Controller {
                     webcam.setViewSize(new Dimension(320, 240));
                     webcam.open();
                 }catch(WebcamLockException e){
-                    //videocallError.setText("Camera already in use");
+                    Platform.runLater(
+                            ()->{
+                                inCallError.setText("Camera already in use");
+                            }
+                    );
                     cameraToggle.setSelected(false);
                     webcam=null;
                     return;
                 }
             }
             else{
-                //videocallError.setText("No camera found");
+                Platform.runLater(
+                        ()->{
+                             inCallError.setText("No camera found");
+                             cameraToggle.setSelected(false);
+                        }
+                );
+                return;
             }
             while(true) {
                 try {
                     cameraSemaphore.acquire(2);
+                    cameraSemaphore.release(2);
                 } catch (InterruptedException e) {
                     return;
                 }
                 BufferedImage image = webcam.getImage();
                 if(image==null)return;
                 sendImage(image);
-                cameraSemaphore.release(2);
+
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
@@ -189,17 +200,17 @@ public class Controller {
             captureMicrophoneThread.start();
         }
         else{
-            if(microphone ==null){
+            if(microphone == null){
                 microphoneToggle.setSelected(false);
                 return;
             }
 
             if(!microphoneToggle.isSelected()){
-                //disable mic thread
+                //disable mic
                 microphone.stop();
             }
             else{
-                //enable mic thread
+                //enable mic
                 microphone.start();
             }
         }
@@ -212,7 +223,12 @@ public class Controller {
                 microphone = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
                 microphone.open(getAudioFormat());
             } catch (LineUnavailableException e) {
-                //logArea.appendText("cannot access your microphone\n");
+                Platform.runLater(
+                        ()->{
+                            inCallError.setText("Cannot access your microphone");
+                            microphoneToggle.setSelected(false);
+                        }
+                );
                 return;
             }
             microphone.start();
@@ -229,11 +245,11 @@ public class Controller {
     }
 
     private AudioFormat getAudioFormat() {
-        float sampleRate = 44100.0F;
+        float sampleRate = 8000.0F;
         //8000,11025,16000,22050,44100
-        int sampleSizeInBits = 16;
+        int sampleSizeInBits = 8;
         //8,16
-        int channels = 2;
+        int channels = 1;
         //1,2
         boolean signed = true;
         //true,false
@@ -252,6 +268,11 @@ public class Controller {
             audioOutputOK=true;
         } catch (LineUnavailableException e) {
             audioOutputOK=false;
+            Platform.runLater(
+                    ()->{
+                        inCallError.setText("Audio output failure");
+                    }
+            );
         }
     }
 
@@ -266,20 +287,21 @@ public class Controller {
     class connectThread extends Thread{
         public void run(){
             try {
-                Socket clientSocket = new Socket(addressField.getText(), port);
+                Socket clientSocket = new Socket();
+                clientSocket.connect(new InetSocketAddress(addressField.getText(), port),1000);
                 OutputStream os = clientSocket.getOutputStream();
                 InputStream is = clientSocket.getInputStream();
                 writer = new PrintWriter(os, true);
                 reader = new BufferedReader(new InputStreamReader(is));
-            } catch (ConnectException e){
-                connFailed("connection failed");
+            } catch (ConnectException |SocketTimeoutException e){
+                connFailed("Connection failed");
                 return;
             }catch(UnknownHostException e){
-                connFailed("incorrect server ip");
+                connFailed("Incorrect server address");
                 return;
             }
             catch (IOException e) {
-                connFailed("unexpected IO Error");
+                connFailed("Unexpected IO Error");
                 return;
             }
             connected();
@@ -304,7 +326,17 @@ public class Controller {
         }
         synchronized (writer) {
             try{
+                if(writer.checkError()){
+                    System.out.println("writer error");
+                }
+                if(msg.length()>200000){
+                    System.out.println("msg.len: "+msg.length());
+                }
                 writer.println(msg);
+                if(writer.checkError()){
+                    System.out.println("writer error");
+                }
+
             } catch(Exception e){
                 System.out.println("writing got problem");
                 e.printStackTrace();
@@ -318,12 +350,12 @@ public class Controller {
     }
 
     public void disconnectHandler() {
-        sendToServer("disconnect","");
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        sendToServer("disconnect","");
+//        try {
+//            Thread.sleep(1500);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         global_exit();
     }
 
@@ -367,23 +399,33 @@ public class Controller {
                             goToCallView();
                             String finalContent1 = content;
                             Platform.runLater(
-                                    ()->callerNameText.setText("Talking with: "+ finalContent1)
+                                    ()->callerNameText.setText(finalContent1)
                             );
                             break;
 
                         case "audio":
                             if (!audioOutputOK) break; //don't process received audio when audio output setup failed
-                            decodedContent = DatatypeConverter.parseBase64Binary(content);
+                            try {
+                                decodedContent = DatatypeConverter.parseBase64Binary(content);
+                            }catch (java.lang.ArrayIndexOutOfBoundsException e){
+                                e.printStackTrace();
+                                continue;
+                            }
+
                             if(speakers.available()<soundBufferSize){
                                 speakers.flush();
-                                System.out.println("Receiving audio would block -> flushed!");
                             }else{
                                 speakers.write(decodedContent, 0, decodedContent.length);
                             }
                             break;
 
                         case "video":
-                            decodedContent = DatatypeConverter.parseBase64Binary(content);
+                            try {
+                                decodedContent = DatatypeConverter.parseBase64Binary(content);
+                            }catch (java.lang.ArrayIndexOutOfBoundsException e){
+                                e.printStackTrace();
+                                continue;
+                            }
                             InputStream is = new ByteArrayInputStream(decodedContent);
                             BufferedImage image = ImageIO.read(is);
                             callerView.setImage(SwingFXUtils.toFXImage(image, null));
@@ -420,7 +462,6 @@ public class Controller {
                             break;
 
                         case "confirm":
-//                            logArea.appendText(content+"\n");
                             if(content.equals("Successfully changed username")){
                                 usernameSet();
                             }
@@ -428,7 +469,7 @@ public class Controller {
                                 goToCallView();
                                 Platform.runLater(
                                         ()->{
-                                            callerNameText.setText("Talking with: "+ callToField.getText());
+                                            callerNameText.setText(callToField.getText());
                                         }
                                 );
                             }
