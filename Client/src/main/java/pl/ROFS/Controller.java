@@ -49,7 +49,7 @@ public class Controller {
     BufferedReader reader;
     private SourceDataLine speakers;
     private Webcam webcam;
-    private final int soundBufferSize=10000;
+    private final int soundBufferSize=1000;
     private boolean audioOutputOK=false;
     private final Semaphore cameraSemaphore = new Semaphore(2, false);
     Thread captureCameraThread;
@@ -267,6 +267,7 @@ public class Controller {
         public void run(){
             try {
                 Socket clientSocket = new Socket(addressField.getText(), port);
+
                 OutputStream os = clientSocket.getOutputStream();
                 InputStream is = clientSocket.getInputStream();
                 writer = new PrintWriter(os, true);
