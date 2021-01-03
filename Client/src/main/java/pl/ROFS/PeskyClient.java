@@ -6,7 +6,10 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
 import java.io.IOException;
@@ -17,12 +20,32 @@ import java.io.IOException;
 public class PeskyClient extends Application {
 
     private static Scene scene;
-
+    double xOffset,yOffset;
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        scene=new Scene(root,600,400);
         primaryStage.setTitle("Pesky Client");
-        primaryStage.setScene(new Scene(root,600,600));
+        primaryStage.initStyle(StageStyle.TRANSPARENT);
+        primaryStage.setScene(scene);
+
+
+        scene.setFill(Color.TRANSPARENT);
+        root.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                xOffset = event.getSceneX();
+                yOffset = event.getSceneY();
+            }
+        });
+        root.setOnMouseDragged(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                primaryStage.setX(event.getScreenX()-xOffset);
+                primaryStage.setY(event.getScreenY()-yOffset);
+            }
+        });
+
         //exit all threads on window close
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
@@ -31,6 +54,9 @@ public class PeskyClient extends Application {
                 System.exit(0);
             }
         });
+
+
+
         primaryStage.show();
     }
 

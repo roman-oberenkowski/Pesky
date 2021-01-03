@@ -1,10 +1,13 @@
 package pl.ROFS;
 
+import com.github.sarxos.webcam.WebcamLockException;
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.JFXToggleButton;
 import javafx.application.Platform;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.AnchorPane;
 import javafx.embed.swing.SwingFXUtils;
 
 import javax.imageio.ImageIO;
@@ -14,71 +17,77 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.*;
 import java.util.Arrays;
+import java.util.concurrent.Semaphore;
 import javax.xml.bind.DatatypeConverter;
 import com.github.sarxos.webcam.Webcam;
 
 
 public class Controller {
-    private final int port = 1235;
-    public Pane loginPane;
-    public Pane callPane;
-    public TextArea ipField;
-    public TextArea usernameField;
-    public Button connectButton;
-    public ImageView myView;
+    private final int port = 4201;
+    public AnchorPane connectionPane;
+    public AnchorPane signInPane;
+    public AnchorPane callToPane;
+    public AnchorPane callPane;
+    public JFXTextField addressField;
+    public JFXTextField usernameField;
+    public JFXTextField callToField;
+    public JFXToggleButton cameraToggle;
+    public JFXToggleButton microphoneToggle;
+    public JFXButton setUsernameButton;
+    public JFXButton callButton;
+    public JFXButton connectButton;
+    public JFXButton disconnectButton;
+    public Label connectionError;
+    public Label signInError;
+    public Label callToError;
+    public Label callerNameText;
+    public Label inCallError;
     public ImageView callerView;
-    public TextArea logArea;
-    public TextArea targetUserField;
-    public Button setUsernameButton;
-    public Button joinCallButton;
-    public Button fastConnectButton;
-    public TextArea callerNameText;
+    public ImageView myView;
+
     PrintWriter writer;
     BufferedReader reader;
     private SourceDataLine speakers;
     private Webcam webcam;
-    private Thread sendAudioThread;
     private final int soundBufferSize=10000;
     private boolean audioOutputOK=false;
+    private final Semaphore cameraSemaphore = new Semaphore(2, false);
+    Thread captureCameraThread;
+    Thread captureMicrophoneThread;
+    TargetDataLine microphone;
 
     public void initialize() {
+        callToPane.setVisible(false);
         callPane.setVisible(false);
-        loginPane.setVisible(true);
-        setUsernameButton.setDisable(true);
-        joinCallButton.setDisable(true);
+        connectionPane.setVisible(true);
+        signInPane.setVisible(false);
+        myView.setScaleX(-1);
     }
 
     public void connected(){
-        Platform.runLater(
-                ()-> connectButton.setText("Connected :)")
-        );
-        ipField.setDisable(true);
-        setUsernameButton.setDisable(false);
+        signInPane.setVisible(true);
+        connectionPane.setVisible(false);
         new ReceiveFromServerThread().start();
     }
 
     public void usernameSet(){
-        setUsernameButton.setDisable(true);
-        usernameField.setDisable(true);
-        joinCallButton.setDisable(false);
+        signInPane.setVisible(false);
+        callToPane.setVisible(true);
     }
 
     public void setUsernameHandler(){
         sendToServer("set_username",usernameField.getText());
+        setUsernameButton.setText("Checking...");
+        signInError.setText("");
     }
 
     public void joinCallHandler(){
-        sendToServer("call_to",targetUserField.getText());
-    }
-
-    public void fastConnect() {
-        ipField.setText("192.168.1.23");
-        connectButtonHandler();
+        sendToServer("call_to", callToField.getText());
     }
 
     public void goToCallView() {
+        callToPane.setVisible(false);
         callPane.setVisible(true);
-        loginPane.setVisible(false);
     }
 
     public void global_exit(){
@@ -87,30 +96,83 @@ public class Controller {
     }
 
     //CAMERA=============================
-    public void startCamera(){
-        webcam = Webcam.getDefault();
-        webcam.setViewSize(new Dimension(320, 240));
-        webcam.open();
-        myView.setScaleX(-1);
-        Thread captureCameraThread = new CaptureCameraThread();
-        captureCameraThread.start();
+    public void cameraHandler(){
+        if(captureCameraThread==null){
+            captureCameraThread = new CaptureCameraThread();
+            captureCameraThread.start();
+        }
+        else{
+            if(webcam==null){
+                cameraToggle.setSelected(false);
+                return;
+            }
+
+            if(!cameraToggle.isSelected()){
+                //disable cam cap thread
+                try {
+                    cameraSemaphore.acquire();
+                } catch (InterruptedException e) {
+                    //failed to block camera
+                    cameraToggle.setSelected(true);
+                    return;
+                }
+                BufferedImage image = null;
+                try {
+                    image = ImageIO.read(getClass().getResource("camera.jpg"));
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (image!=null)
+                    sendImage(image);
+            }
+            else{
+                //enable cam cap thread
+                cameraSemaphore.release();
+            }
+        }
+    }
+
+    public void sendImage(BufferedImage image){
+        myView.setImage(SwingFXUtils.toFXImage(image, null));
+        ByteArrayOutputStream img_stream=new ByteArrayOutputStream();
+        try {
+            ImageIO.write(image,"jpg",img_stream);
+        } catch (IOException e) {
+            return;
+        }
+        byte [] img_byte_array=img_stream.toByteArray();
+        String video_data=DatatypeConverter.printBase64Binary(img_byte_array);
+        sendToServer("video",video_data);
     }
 
     private class CaptureCameraThread extends Thread{
         public void run(){
-            while(true) {
-                BufferedImage image = webcam.getImage();
-                myView.setImage(SwingFXUtils.toFXImage(image, null));
-                ByteArrayOutputStream img_stream=new ByteArrayOutputStream();
-                try {
-                    ImageIO.write(image,"jpg",img_stream);
-                } catch (IOException e) {
-                    e.printStackTrace();
+            webcam = Webcam.getDefault();
+            if (webcam!=null){
+                try{
+                    webcam.setViewSize(new Dimension(320, 240));
+                    webcam.open();
+                }catch(WebcamLockException e){
+                    //videocallError.setText("Camera already in use");
+                    cameraToggle.setSelected(false);
+                    webcam=null;
+                    return;
                 }
-                byte [] img_byte_array=img_stream.toByteArray();
-                String video_data=DatatypeConverter.printBase64Binary(img_byte_array);
-                sendToServer("video",video_data);
-
+            }
+            else{
+                //videocallError.setText("No camera found");
+            }
+            while(true) {
+                try {
+                    cameraSemaphore.acquire(2);
+                } catch (InterruptedException e) {
+                    return;
+                }
+                BufferedImage image = webcam.getImage();
+                if(image==null)return;
+                sendImage(image);
+                cameraSemaphore.release(2);
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
@@ -121,27 +183,43 @@ public class Controller {
     }
 
     //AUDIO==============================
-    public void startRecordingMic(){
-        new SendMicrophoneThread().start();
+    public void microphoneToggleHandler(){
+        if(captureMicrophoneThread ==null){
+            captureMicrophoneThread = new SendMicrophoneThread();
+            captureMicrophoneThread.start();
+        }
+        else{
+            if(microphone ==null){
+                microphoneToggle.setSelected(false);
+                return;
+            }
 
+            if(!microphoneToggle.isSelected()){
+                //disable mic thread
+                microphone.stop();
+            }
+            else{
+                //enable mic thread
+                microphone.start();
+            }
+        }
     }
 
     private class SendMicrophoneThread extends Thread{
         public void run(){
             DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, getAudioFormat());
-            TargetDataLine targetDataLine;
             try {
-                targetDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
-                targetDataLine.open(getAudioFormat());
+                microphone = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
+                microphone.open(getAudioFormat());
             } catch (LineUnavailableException e) {
-                logArea.appendText("cannot access your microphone\n");
+                //logArea.appendText("cannot access your microphone\n");
                 return;
             }
-            targetDataLine.start();
+            microphone.start();
             byte[] tempBuffer = new byte[soundBufferSize];
             int cnt=1;
             while (cnt>=0) {
-                cnt = targetDataLine.read(tempBuffer, 0, tempBuffer.length);
+                cnt = microphone.read(tempBuffer, 0, tempBuffer.length);
                 if (cnt > 0) {
                     String audio_data=DatatypeConverter.printBase64Binary(Arrays.copyOfRange(tempBuffer,0,cnt));
                     sendToServer("audio",audio_data);
@@ -179,16 +257,16 @@ public class Controller {
 
     //NETWORK
     public void connectButtonHandler() {
-        fastConnectButton.setDisable(true);
         connectButton.setDisable(true);
         connectButton.setText("Connecting...");
+        connectionError.setText("");
         new connectThread().start();
     }
 
     class connectThread extends Thread{
         public void run(){
             try {
-                Socket clientSocket = new Socket(ipField.getText(), port);
+                Socket clientSocket = new Socket(addressField.getText(), port);
                 OutputStream os = clientSocket.getOutputStream();
                 InputStream is = clientSocket.getInputStream();
                 writer = new PrintWriter(os, true);
@@ -207,9 +285,9 @@ public class Controller {
             connected();
         }
         public void connFailed(String text){
-            logArea.appendText(text+"\n");
             Platform.runLater(
                     ()-> {
+                        connectionError.setText(text);
                         connectButton.setText("Connect");
                         connectButton.setDisable(false);
                     }
@@ -217,12 +295,13 @@ public class Controller {
         }
     }
 
-    private void disconnectedHandler(){
-        global_exit();
-    }
-
     private void sendToServer(String type,String content){
-        String msg="type:"+type+";content:"+content;
+        String msg;
+        if(content.length()>0)
+            msg="type:"+type+";content:"+content;
+        else{
+            msg="type:"+type+";";
+        }
         synchronized (writer) {
             try{
                 writer.println(msg);
@@ -232,6 +311,20 @@ public class Controller {
                 global_exit();
             }
         }
+    }
+
+    private void disconnectedHandler(){
+        global_exit();
+    }
+
+    public void disconnectHandler() {
+        sendToServer("disconnect","");
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        global_exit();
     }
 
     class ReceiveFromServerThread extends Thread{
@@ -251,14 +344,16 @@ public class Controller {
                         serverMessage = reader.readLine();
                     } catch(SocketException | SocketTimeoutException e){
                         disconnectedHandler();
+                        return;
                     }
                     try {
+                        if(serverMessage == null)return;
                         cut_message = serverMessage.split(";");
                         type = cut_message[0].split(":")[1];
                         right = cut_message[1];
                     }
                     catch(ArrayIndexOutOfBoundsException e){
-                        logArea.appendText("Message format error! omitting -> "+serverMessage+"\n");
+                        System.out.println("Message format error! omitting -> "+serverMessage+"\n");
                         continue;
                     }
                     try {
@@ -270,8 +365,10 @@ public class Controller {
                     switch(type){
                         case "joined":
                             goToCallView();
-                            callerNameText.setText("Talking with: "+content);
-                            logArea.appendText("Joined "+content);
+                            String finalContent1 = content;
+                            Platform.runLater(
+                                    ()->callerNameText.setText("Talking with: "+ finalContent1)
+                            );
                             break;
 
                         case "audio":
@@ -295,25 +392,50 @@ public class Controller {
                         case "disconnect":
                             System.out.println("Exiting because server said so");
                             global_exit();
-                            break;
+                            return;
 
                         case "error":
-                            logArea.appendText(content+"\n");
+                            System.out.println(serverMessage);
+                              if (signInPane.isVisible()){
+                                  String finalContent = content;
+                                  Platform.runLater(
+                                          ()->{
+                                              signInError.setText(finalContent);
+                                              setUsernameButton.setDisable(false);
+                                              setUsernameButton.setText("Sign in");
+                                          }
+                                  );
+                              }
+                              if(callToPane.isVisible()){
+                                  String finalContent = content;
+                                  Platform.runLater(
+                                          ()->{
+                                              callToError.setText(finalContent);
+                                              //callButton.setDisable(false);
+                                              //callButton.setText("Sign in");
+                                          }
+                                  );
+                              }
+
                             break;
 
                         case "confirm":
-                            logArea.appendText(content+"\n");
+//                            logArea.appendText(content+"\n");
                             if(content.equals("Successfully changed username")){
                                 usernameSet();
                             }
                             if(content.equals("Successfully called user")){
                                 goToCallView();
-                                callerNameText.setText("Talking with: "+targetUserField.getText());
+                                Platform.runLater(
+                                        ()->{
+                                            callerNameText.setText("Talking with: "+ callToField.getText());
+                                        }
+                                );
                             }
                             break;
 
                         default:
-                            logArea.appendText("type error in received message! -> "+type+"\n");
+                            System.out.println("type error in received message! -> "+type+"\n");
                     }
                 }
 
@@ -324,35 +446,4 @@ public class Controller {
             }
         }
     }
-
-    //TEMP
-    public void startPlayingAudioClip() {
-        if(sendAudioThread == null) {
-            sendAudioThread = new SendAudioClipThread();
-            sendAudioThread.start();
-        }
-    }
-
-    class SendAudioClipThread extends Thread{
-        public void run(){
-            try {
-                byte[] tempBuffer = new byte[soundBufferSize];
-                AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(getClass().getResource("clip2.wav"));
-                int cnt=1;
-                while (cnt>=0) {
-                    cnt = audioInputStream.read(tempBuffer, 0, tempBuffer.length);
-                    if (cnt > 0) {
-                        String audio_data=DatatypeConverter.printBase64Binary(Arrays.copyOfRange(tempBuffer,0,cnt));
-                        sendToServer("audio",audio_data);
-                    }
-                    Thread.sleep(56);
-                }
-            } catch (IOException | UnsupportedAudioFileException | InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
-
 }
