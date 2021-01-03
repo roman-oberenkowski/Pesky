@@ -268,6 +268,11 @@ public class Controller {
             audioOutputOK=true;
         } catch (LineUnavailableException e) {
             audioOutputOK=false;
+            Platform.runLater(
+                    ()->{
+                        inCallError.setText("Audio output failure");
+                    }
+            );
         }
     }
 
@@ -282,22 +287,21 @@ public class Controller {
     class connectThread extends Thread{
         public void run(){
             try {
-                Socket clientSocket = new Socket(addressField.getText(), port);
-                System.out.println(clientSocket.isConnected());
-
+                Socket clientSocket = new Socket();
+                clientSocket.connect(new InetSocketAddress(addressField.getText(), port),1000);
                 OutputStream os = clientSocket.getOutputStream();
                 InputStream is = clientSocket.getInputStream();
                 writer = new PrintWriter(os, true);
                 reader = new BufferedReader(new InputStreamReader(is));
-            } catch (ConnectException e){
-                connFailed("connection failed");
+            } catch (ConnectException |SocketTimeoutException e){
+                connFailed("Connection failed");
                 return;
             }catch(UnknownHostException e){
-                connFailed("incorrect server ip");
+                connFailed("Incorrect server address");
                 return;
             }
             catch (IOException e) {
-                connFailed("unexpected IO Error");
+                connFailed("Unexpected IO Error");
                 return;
             }
             connected();
@@ -394,7 +398,6 @@ public class Controller {
                             decodedContent = DatatypeConverter.parseBase64Binary(content);
                             if(speakers.available()<soundBufferSize){
                                 speakers.flush();
-                                System.out.println("Receiving audio would block -> flushed!");
                             }else{
                                 speakers.write(decodedContent, 0, decodedContent.length);
                             }
