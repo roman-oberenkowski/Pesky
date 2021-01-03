@@ -154,25 +154,36 @@ public class Controller {
                     webcam.setViewSize(new Dimension(320, 240));
                     webcam.open();
                 }catch(WebcamLockException e){
-                    //videocallError.setText("Camera already in use");
+                    Platform.runLater(
+                            ()->{
+                                inCallError.setText("Camera already in use");
+                            }
+                    );
                     cameraToggle.setSelected(false);
                     webcam=null;
                     return;
                 }
             }
             else{
-                //videocallError.setText("No camera found");
+                Platform.runLater(
+                        ()->{
+                             inCallError.setText("No camera found");
+                             cameraToggle.setSelected(false);
+                        }
+                );
+                return;
             }
             while(true) {
                 try {
                     cameraSemaphore.acquire(2);
+                    cameraSemaphore.release(2);
                 } catch (InterruptedException e) {
                     return;
                 }
                 BufferedImage image = webcam.getImage();
                 if(image==null)return;
                 sendImage(image);
-                cameraSemaphore.release(2);
+
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
@@ -189,7 +200,7 @@ public class Controller {
             captureMicrophoneThread.start();
         }
         else{
-            if(microphone ==null){
+            if(microphone == null){
                 microphoneToggle.setSelected(false);
                 return;
             }
@@ -212,7 +223,11 @@ public class Controller {
                 microphone = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
                 microphone.open(getAudioFormat());
             } catch (LineUnavailableException e) {
-                //logArea.appendText("cannot access your microphone\n");
+                Platform.runLater(
+                        ()->{
+                            inCallError.setText("Cannot access your microphone");
+                        }
+                );
                 return;
             }
             microphone.start();
@@ -267,7 +282,6 @@ public class Controller {
         public void run(){
             try {
                 Socket clientSocket = new Socket(addressField.getText(), port);
-
                 OutputStream os = clientSocket.getOutputStream();
                 InputStream is = clientSocket.getInputStream();
                 writer = new PrintWriter(os, true);
@@ -368,7 +382,7 @@ public class Controller {
                             goToCallView();
                             String finalContent1 = content;
                             Platform.runLater(
-                                    ()->callerNameText.setText("Talking with: "+ finalContent1)
+                                    ()->callerNameText.setText(finalContent1)
                             );
                             break;
 
@@ -421,7 +435,6 @@ public class Controller {
                             break;
 
                         case "confirm":
-//                            logArea.appendText(content+"\n");
                             if(content.equals("Successfully changed username")){
                                 usernameSet();
                             }
@@ -429,7 +442,7 @@ public class Controller {
                                 goToCallView();
                                 Platform.runLater(
                                         ()->{
-                                            callerNameText.setText("Talking with: "+ callToField.getText());
+                                            callerNameText.setText(callToField.getText());
                                         }
                                 );
                             }
