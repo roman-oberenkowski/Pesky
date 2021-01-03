@@ -206,11 +206,11 @@ public class Controller {
             }
 
             if(!microphoneToggle.isSelected()){
-                //disable mic thread
+                //disable mic
                 microphone.stop();
             }
             else{
-                //enable mic thread
+                //enable mic
                 microphone.start();
             }
         }
@@ -226,6 +226,7 @@ public class Controller {
                 Platform.runLater(
                         ()->{
                             inCallError.setText("Cannot access your microphone");
+                            microphoneToggle.setSelected(false);
                         }
                 );
                 return;
@@ -282,6 +283,8 @@ public class Controller {
         public void run(){
             try {
                 Socket clientSocket = new Socket(addressField.getText(), port);
+                System.out.println(clientSocket.isConnected());
+
                 OutputStream os = clientSocket.getOutputStream();
                 InputStream is = clientSocket.getInputStream();
                 writer = new PrintWriter(os, true);

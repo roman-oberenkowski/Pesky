@@ -177,7 +177,7 @@ int processForwardMessage(User *user, char *message) {
 }
 
 int processIncorrectMessage(struct thread_data_t *thread_data, char *message, const char *type, char *content) {
-    sendErrorMessage(thread_data->user, "Recieved incorrect message", 1);
+    sendErrorMessage(thread_data->user, message, 1);
     if (DEBUG == 1) {
         getContent(message, content);
         printf("INFO: \t Recieved incorrect message type> \"%s\" content> \"%s\"\n", type, content);
