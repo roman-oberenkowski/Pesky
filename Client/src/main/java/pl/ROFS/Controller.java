@@ -326,7 +326,17 @@ public class Controller {
         }
         synchronized (writer) {
             try{
+                if(writer.checkError()){
+                    System.out.println("writer error");
+                }
+                if(msg.length()>200000){
+                    System.out.println("msg.len: "+msg.length());
+                }
                 writer.println(msg);
+                if(writer.checkError()){
+                    System.out.println("writer error");
+                }
+
             } catch(Exception e){
                 System.out.println("writing got problem");
                 e.printStackTrace();
@@ -395,7 +405,13 @@ public class Controller {
 
                         case "audio":
                             if (!audioOutputOK) break; //don't process received audio when audio output setup failed
-                            decodedContent = DatatypeConverter.parseBase64Binary(content);
+                            try {
+                                decodedContent = DatatypeConverter.parseBase64Binary(content);
+                            }catch (java.lang.ArrayIndexOutOfBoundsException e){
+                                e.printStackTrace();
+                                continue;
+                            }
+
                             if(speakers.available()<soundBufferSize){
                                 speakers.flush();
                             }else{
@@ -404,7 +420,12 @@ public class Controller {
                             break;
 
                         case "video":
-                            decodedContent = DatatypeConverter.parseBase64Binary(content);
+                            try {
+                                decodedContent = DatatypeConverter.parseBase64Binary(content);
+                            }catch (java.lang.ArrayIndexOutOfBoundsException e){
+                                e.printStackTrace();
+                                continue;
+                            }
                             InputStream is = new ByteArrayInputStream(decodedContent);
                             BufferedImage image = ImageIO.read(is);
                             callerView.setImage(SwingFXUtils.toFXImage(image, null));
