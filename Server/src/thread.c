@@ -41,6 +41,7 @@ void exitThread(struct thread_data_t *thread_data) {
 void *ThreadBehavior(void *t_data) {
     char user_data[MAX_INCOMING_SIZE * 3] = "";
     char incoming_data[MAX_INCOMING_SIZE];
+    char *message_rests;
     char *message;
 
     int size;
@@ -55,21 +56,24 @@ void *ThreadBehavior(void *t_data) {
             incoming_data[size] = '\0';
         strcat(user_data, incoming_data);
 
-        while (strchr(user_data, MSG_DELIMITER_CHR) != NULL) {
-            message = strtok(user_data, MSG_DELIMITER_STR);
-            connection_status = processMessage(th_data, message);
+        if (strchr(user_data, MSG_DELIMITER_CHR) != NULL)
+        {
+            message_rests = user_data;
+            do {
+                message = strtok_r(message_rests, MSG_DELIMITER_STR, &message_rests);
+                connection_status = processMessage(th_data, message);
+                if (connection_status == 0)
+                    break;
+            } while (strlen(message_rests) > 0 && strchr(message_rests, MSG_DELIMITER_CHR) != NULL);
             if (connection_status == 0)
                 break;
-            message = strtok(NULL, MSG_DELIMITER_STR);
-            if (message == NULL)
-                memset(user_data, 0, strlen(user_data));
+            if (strlen(message_rests) > 0)
+                strcpy(user_data, message_rests);
             else
-                strcpy(user_data, message);
+                memset(user_data, 0, strlen(user_data));
         }
-        if (connection_status == 0)
-            break;
     }
-    pthread_detach(pthread_self());
     exitThread(th_data);
+    pthread_detach(pthread_self());
     return 0;
 }

@@ -17,7 +17,7 @@ void close_server() {
             pthread_mutex_lock(&list->list->user->mutex);
             user = list->list->user;
             shutdown(user->connection_descriptor, SHUT_RDWR);
-            read(user->connection_descriptor, NULL, NULL);
+            read(user->connection_descriptor, NULL, 0);
             close(user->connection_descriptor);
             list->list = remove_user_from_usr_list(list->list, user);
             pthread_mutex_unlock(&user->mutex);
