@@ -340,12 +340,12 @@ public class Controller {
     }
 
     public void disconnectHandler() {
-        sendToServer("disconnect","");
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        sendToServer("disconnect","");
+//        try {
+//            Thread.sleep(1500);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         global_exit();
     }
 
