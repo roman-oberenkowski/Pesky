@@ -5,7 +5,7 @@ Projekt komunikatora audio-video na laboratoria z Sieci Komputerowych
 - Klient - Java 11 z Mavenem - `mvn javafx:run`.
 - Serwer - C11 - `gcc src/main.c src/constants.h src/main_server.c src/main_server.h src/thread.c src/thread.h src/messaging.c src/messaging.h src/structs/list_head.c src/structs/list_head.h src/structs/user.c src/structs/user.h -l pthread -o server -Wall` bądź też z wykorzystaniem make. W celu uruchomienia tak skompilowanego projektu wystarczy uruchomić plik `./server`.
 
-## Protokuł komunikacyjny
+## Protokół komunikacyjny
 Wiadomości wysyłane przez projekt mają stałą, ustaloną strukturę `type:<typ_wiadomości>;content:<zawartość>\n`. 
 
 Po nawiązaniu połączenia użytkownik może wysłać następujące typy wiadomości:
@@ -40,21 +40,21 @@ Działanie serwera podzielić można na 3 etapy:
 
 ### Implementacja klienta
 
-Klient jest napisany w Javie z wykorzystaniem JavaFX oraz JFoenix. Do budowania projektu wykorzystyawne jest narzędzie Maven. Do komunikacji sieciowej wykorzystano Java Socket (opakowane przez PrintWriter i BufferedReader). 
+Klient jest napisany w Javie z wykorzystaniem JavaFX oraz JFoenix. Do budowania projektu wykorzystywane jest narzędzie Maven. Do komunikacji sieciowej wykorzystano Java Socket (opakowane przez PrintWriter i BufferedReader). 
 
 Obsługa funkcji sieciowych realizowana jest w osobnych wątkach, żeby nie blokować interfejsu użytkownika. Klient wykorzystuje po jednym wątku dla:
 - przechwytywania i wysyłania audio z mikrofonu, 
 - przechwytywania i wysyłania obrazu z kamerki, 
 - odbierania danych od servera i wykonywania związanych z nimi akcji. 
 
-Dodatkowy wątek jest wykorzstywany podczas próby połączenia z serverem. Do przechwytywania i odtwarzania dzwięku użyto biblioteki javax.sound.sampled, a do obsługi kamerki bibliotekę sarxos.webcam. 
+Dodatkowy wątek jest wykorzstywany podczas próby połączenia z serverem. Do przechwytywania i odtwarzania dzwięku użyto biblioteki javax.sound.sampled, a do obsługi kamerki biblioteki sarxos.webcam. 
 
-Program uzyskuje dostęp do lini audio (poprzez własny bufor), a także kamerki i enkoduje odczytane dane przy pomocy Base64 encoding - dzięki temu upewniamy się, że specjalne znaki wykorzystywane w naszym protokole nie pojawią się w polu content. 
+Program uzyskuje dostęp do lini wejścia audio (poprzez własny bufor), a także kamerki i enkoduje odczytane dane przy pomocy Base64 encoding - dzięki temu upewniamy się, że specjalne znaki wykorzystywane w naszym protokole nie pojawią się w polu content. 
 
 Tak przygotowane informacje są przesyłane jako "content" do servera, który zajmuje się przekierowaniem ich do odpowiedniego odbiorcy. 
 Drugi klient podłączony do tej samej rozmowy odwraca proces dekodując dane i przesyłając dzwięk do wyjścia audio, a klatkę obrazu z kamerki do interfejsu użytkownika.
 Żeby zminimalizować opóźnienie dzwięku powstające przez chwilowe rozłączenia, wątek odbiorczy sprawdza, czy wyjściowy bufor audio nie jest przypadkiem zapełniony. 
-W razie potrzeby czyści bufor, co pozwala utrzymać opóźnienie dzwięku na wystarczającym poziomie, by prowadzić rozmowę. Bez tego mechanizmu każda sekunda, w której bufor wyjścia audio był pusty powodowałaby kaskadowe narastanie opóźnienia dziwęku - dochodziło nawet do 30-sekundowego opóźnienia w transmisji audio. 
+W razie potrzeby czyści bufor, co pozwala utrzymać opóźnienie dzwięku na wystarczającym poziomie, by prowadzić rozmowę. Bez tego mechanizmu każda sekunda, w której bufor wyjścia audio był pusty powodowałaby kaskadowo narastające opóźnienia dziwęku - dochodziłoby nawet do 30-sekundowego opóźnienia w transmisji audio. 
 Wyłączenie kamerki jest realizowane przez zablokowanie semafora, z któego korzysta wątek odpowiedzialny za wysyłanie obrazu. 
 Dzięki temu nie ma aktywnego czekania. Wyłącznie mikrofonu było prostsze, gdyż wystarczyło zatrzymać linię wejścia audio. 
 Rozłączenie po stronie klienta jest realizowane przez zamknięcie socketu. Serwer reagując na to wysyła informację do drugiego klienta o zakończeniu rozmowy i dopiero potem zamyka połączenie.
