@@ -68,10 +68,7 @@ public class VideoController {
                 }
                 if (image!=null){
                     sendImage(image);
-                }else{
-                    System.out.println("img error");
                 }
-
             }
             else{
                 cameraSemaphore.release();

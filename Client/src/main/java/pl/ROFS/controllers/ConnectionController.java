@@ -33,26 +33,14 @@ public class ConnectionController {
 
     public void send(String type,String content) {
         String msg;
-        if(content.length()>0)
-            msg="type:"+type+";content:"+content;
-        else{
-            msg="type:"+type+";";
-        }
+        msg="type:"+type+";content:"+content;
         synchronized (writer) {
             try{
-                if(writer.checkError()){
-                    System.out.println("writer error");
-                }
-                if(msg.length()>200000){
-                    System.out.println("msg.len: "+msg.length());
-                }
                 writer.println(msg);
                 if(writer.checkError()){
-                    System.out.println("writer error");
+                    clientController.global_exit();
                 }
-
             } catch(Exception e){
-                System.out.println("writing got problem");
                 e.printStackTrace();
                 clientController.global_exit();
             }
