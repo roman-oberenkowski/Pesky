@@ -23,7 +23,7 @@ public class PeskyClient extends Application {
     double xOffset,yOffset;
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("application.fxml"));
         scene=new Scene(root,600,400);
         primaryStage.setTitle("Pesky Client");
         primaryStage.initStyle(StageStyle.TRANSPARENT);
