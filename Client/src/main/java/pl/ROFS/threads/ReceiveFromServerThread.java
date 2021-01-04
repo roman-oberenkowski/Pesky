@@ -31,7 +31,6 @@ public class ReceiveFromServerThread extends Thread {
             connectionController.getClientController().disconnectedHandler();
             return "";
         } catch (IOException e) {
-            System.out.println("receive from server got problems");
             e.printStackTrace();
             connectionController.getClientController().global_exit();
             return "";
@@ -40,8 +39,6 @@ public class ReceiveFromServerThread extends Thread {
 
     public HashMap<String, String> processServerMessage(String serverMessage)
     {
-        String content;
-        String type;
         String[] cut_message;
         String right;
 
@@ -55,7 +52,6 @@ public class ReceiveFromServerThread extends Thread {
             message.put("type", cut_message[0].split(":")[1]);
             right = cut_message[1];
         } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("Message format error! omitting -> " + serverMessage + "\n");
             message.put("type", "undefined");
             return message;
         }
@@ -115,7 +111,6 @@ public class ReceiveFromServerThread extends Thread {
                         connectionController.getClientController().global_exit();
                         return;
                     case "error":
-                        System.out.println(serverMessage);
                         connectionController.getClientController().errorMessageHandler(processedMessage.get("content"));
                         break;
                     case "confirm":
@@ -128,8 +123,6 @@ public class ReceiveFromServerThread extends Thread {
                         break;
                     case "undefined":
                         break;
-                    default:
-                        System.out.println("Type error in received message! -> " + processedMessage.get("type") + "\n");
                 }
             }
 
