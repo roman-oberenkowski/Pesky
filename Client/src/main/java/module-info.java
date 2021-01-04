@@ -12,4 +12,6 @@ module pl.ROFS {
 
     opens pl.ROFS to javafx.fxml;
     exports pl.ROFS;
+    exports pl.ROFS.controllers;
+    exports pl.ROFS.threads;
 }
