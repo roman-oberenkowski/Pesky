@@ -6,6 +6,7 @@
 
 User *create_user() {
     User *user = (User *) malloc(sizeof(User));
+    strcpy(user->username, "");
     user->username = (char *) malloc(32 * sizeof(char));
     user->connection_descriptor = -1;
     user->connected_with = NULL;
