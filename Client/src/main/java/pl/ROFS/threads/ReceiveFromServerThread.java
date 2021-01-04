@@ -72,6 +72,8 @@ public class ReceiveFromServerThread extends Thread {
             HashMap<String, String> processedMessage;
             while (true) {
                 serverMessage = getServerMessage();
+                if (serverMessage==null)
+                    continue;
                 processedMessage = processServerMessage(serverMessage);
                 switch (processedMessage.get("type")) {
                     case "joined":
