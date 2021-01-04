@@ -46,7 +46,7 @@ public class AudioController {
                 clientController.microphoneToggle.setSelected(false);
                 return;
             }
-            if(!clientController.microphoneToggle.isSelected())
+            if(clientController.microphoneToggle.isSelected())
                 microphone.start();
             else
                 microphone.stop();

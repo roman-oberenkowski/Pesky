@@ -41,9 +41,9 @@ public class ClientController {
     private ConnectionController connectionController;
 
     public ClientController () {
-        connectionController= new ConnectionController(this);
         audioController = new AudioController(this);
         videoController = new VideoController(this);
+        connectionController= new ConnectionController(this);
     }
 
     public AudioController getAudioController() { return audioController; }

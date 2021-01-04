@@ -20,7 +20,6 @@ public class VideoController {
 
     public VideoController (ClientController controller) {
         this.clientController = controller;
-        this.captureCameraThread = new CameraCaptureThread(this);
     }
 
     public void setWebcam(Webcam webcam) { this.webcam = webcam; }
@@ -62,13 +61,17 @@ public class VideoController {
                 }
                 BufferedImage image = null;
                 try {
-                    image = ImageIO.read(getClass().getResource("camera.jpg"));
+                    image = ImageIO.read(getClientController().getClass().getResource("camera.jpg"));
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                if (image!=null)
+                if (image!=null){
                     sendImage(image);
+                }else{
+                    System.out.println("img error");
+                }
+
             }
             else{
                 cameraSemaphore.release();

@@ -19,6 +19,7 @@ public class ReceiveFromServerThread extends Thread {
 
     public ReceiveFromServerThread(ConnectionController connectionController) {
         this.connectionController = connectionController;
+        System.out.println(connectionController);
         this.audioController = connectionController.getClientController().getAudioController();
     }
 
