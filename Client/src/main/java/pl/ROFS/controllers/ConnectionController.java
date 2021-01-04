@@ -1,6 +1,7 @@
 package pl.ROFS.controllers;
 
 import pl.ROFS.threads.ConnectThread;
+import pl.ROFS.threads.DisconnectWatchdogThread;
 import pl.ROFS.threads.ReceiveFromServerThread;
 
 import java.io.BufferedReader;
@@ -54,4 +55,6 @@ public class ConnectionController {
     public void startConnectThread() {
         new ConnectThread(this).start();
     }
+
+    public void startDisconnectWatchdogThread(){new DisconnectWatchdogThread(this).start();}
 }

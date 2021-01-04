@@ -126,6 +126,7 @@ public class ClientController {
     }
 
     public void disconnectHandler() {
+        connectionController.startDisconnectWatchdogThread();
         connectionController.send("disconnect","");
         global_exit();
     }
