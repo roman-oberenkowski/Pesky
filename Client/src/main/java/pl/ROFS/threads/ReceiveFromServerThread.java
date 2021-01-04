@@ -19,7 +19,6 @@ public class ReceiveFromServerThread extends Thread {
 
     public ReceiveFromServerThread(ConnectionController connectionController) {
         this.connectionController = connectionController;
-        System.out.println(connectionController);
         this.audioController = connectionController.getClientController().getAudioController();
     }
 
@@ -48,15 +47,15 @@ public class ReceiveFromServerThread extends Thread {
                 message.put("type", "undefined");
                 return message;
             }
-            cut_message = serverMessage.split(";");
-            message.put("type", cut_message[0].split(":")[1]);
+            cut_message = serverMessage.split(";",2);
+            message.put("type", cut_message[0].split(":",2)[1]);
             right = cut_message[1];
         } catch (ArrayIndexOutOfBoundsException e) {
             message.put("type", "undefined");
             return message;
         }
         try {
-            message.put("content", right.split(":")[1]);
+            message.put("content", right.split(":",2)[1]);
         } catch (ArrayIndexOutOfBoundsException e) {
             message.put("content", "");
         }
@@ -129,7 +128,6 @@ public class ReceiveFromServerThread extends Thread {
             }
 
         } catch (IOException e) {
-            System.out.println("receive from server got problems");
             e.printStackTrace();
             connectionController.getClientController().global_exit();
         }
