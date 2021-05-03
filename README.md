@@ -1,5 +1,6 @@
 # Pesky
 Projekt komunikatora audio-video na laboratoria z Sieci Komputerowych
+ ![demo](https://github.com/roman-oberenkowski/Pesky/blob/cee605176dc9c3433e8ada5a70597bad98f62792/readme_resources/demo.gif)
 
 ## Kompilacja i uruchamianie
 - Klient - Java 11 z Mavenem - `mvn javafx:run`.
